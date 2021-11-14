@@ -2,21 +2,21 @@
 using namespace std;
 
 const int UNIT = 8; //Tamaño de caja en la tabla
-const int LADT = (5*UNIT)+1; //Largo y Ancho De Tabla
+const int TWaH = (5*UNIT)+1; //Table Width and Height
 int Xant = 3, Yant = 3; // X anterior, Y anterior
 bool playerMoved;
 int highlightedCoordX = 0, highlightedCoordY = 0;
 
 struct player {
-    string nombre;
+    string name;
     string color;
-    int fichas_capturadas;
+    int captured_pieces;
 };
 
-string colorJ1;
-string colorJ2;
+string colorP1;
+string colorP2;
 
-int grid[LADT][LADT] = {
+int grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
@@ -76,8 +76,8 @@ int gridBackground[5][5] = {
     {1,0,1,0,1}
 };
 
-string interpretar(int num) {
-    string re; //variable para REtornar
+string interperate(int num) {
+    string re; //vaiable to REturn
     switch(num) {
         case 0:
             re = "!!"; //#c7c7c7 - light square color
@@ -86,10 +86,10 @@ string interpretar(int num) {
             re = "OO"; //#751616 - dark square color
             break;
         case 2:
-            re = colorJ1; //#xxxxxx - jugador elige color
+            re = colorP1; //#xxxxxx - player chooses color
             break;
         case 3:
-            re = colorJ2; //#xxxxxx - jugador elige color
+            re = colorP2; //#xxxxxx - player chooses color
             break;
         case 7:
             re = "  "; //#fcdf00 - selector color
@@ -101,22 +101,22 @@ string interpretar(int num) {
             re = "=="; //#000000 - black border color
             break;
         default:
-            re = "  ";
+            re = "/\\";
             break;
     }
     return re;
 }
 
 void printGrid() {
-    for(int j=0; j<LADT; j++) {
-        for(int i=0; i<LADT; i++) {
-            cout << interpretar(grid[j][i]);
+    for(int j=0; j<TWaH; j++) {
+        for(int i=0; i<TWaH; i++) {
+            cout << interperate(grid[j][i]);
         }
         cout << endl;
     }
 }
 
-void cuadroSeleccion(int x, int y) {
+void selectSquare(int x, int y) {
     int startPosX = UNIT * (x-1);
     int startPosY = UNIT * (y-1);
     for(int i=0; i<9; i++) {
@@ -127,7 +127,7 @@ void cuadroSeleccion(int x, int y) {
     }
 }
 
-void revertirCuadro(int x, int y) {
+void revertSquare(int x, int y) {
     int startPosX = UNIT * (x-1);
     int startPosY = UNIT * (y-1);
     for(int i=0; i<9; i++) {
@@ -138,7 +138,7 @@ void revertirCuadro(int x, int y) {
     }
 }
 
-void drawPlayer(int p, int x, int y) {
+void drawPiece(int p, int x, int y) {
     int player;
     int startPosX = UNIT * (x-1) + 2;
     int startPosY = UNIT * (y-1) + 2;
@@ -163,7 +163,7 @@ void drawPlayer(int p, int x, int y) {
     }
 }
 
-void borrarFicha(int x, int y) {
+void errasePiece(int x, int y) {
     int startPosX = UNIT * (x-1) + 2;
     int startPosY = UNIT * (y-1) + 2;
     for(int j=0; j<5; j++) {
@@ -199,12 +199,12 @@ void unHighlightSquare(int x, int y) {
     }
 }
 
-void mover(int p, int *x, int *y) {
-    char tecla;
+void move(int p, int *x, int *y) {
+    char key;
     Xant = *x;
     Yant = *y;
-    cin >> tecla;
-    switch(tecla) {
+    cin >> key;
+    switch(key) {
         case 'w':
             if(*x != 1) *x = *x - 1;
             break;
@@ -219,7 +219,7 @@ void mover(int p, int *x, int *y) {
             break;
         case 'p':
             if(gridStats[*x-1][*y-1] == 0) {
-                drawPlayer(p,*x,*y);
+                drawPiece(p,*x,*y);
                 gridStats[*x-1][*y-1] = p;
                 playerMoved = true;
             }
@@ -237,9 +237,9 @@ void mover(int p, int *x, int *y) {
                 if((abs(*x - highlightedCoordX) == 1 && abs(*y - highlightedCoordY) == 0) || (abs(*x - highlightedCoordX) == 0 && abs(*y - highlightedCoordY) == 1)) {
                     gridStats[*x-1][*y-1] = p;
                     gridStats[highlightedCoordX-1][highlightedCoordY-1] = 0;
-                    drawPlayer(p, *x, *y);
+                    drawPiece(p, *x, *y);
                     unHighlightSquare(highlightedCoordX, highlightedCoordY);
-                    borrarFicha(highlightedCoordX, highlightedCoordY);
+                    errasePiece(highlightedCoordX, highlightedCoordY);
                     playerMoved = true;
                     highlightedCoordX = 0;
                     highlightedCoordY = 0;
@@ -265,21 +265,21 @@ int main() {
     int X = 3, Y = 3;
     int *ptrX = &X;
     int *ptrY = &Y;
-    player jugador1;
-    player jugador2;
+    player player1;
+    player player2;
 
-    jugador1.color = "1 ";
-    jugador2.color = "2 ";
+    player1.color = "1 ";
+    player2.color = "2 ";
 
-    colorJ1 = jugador1.color;
-    colorJ2 = jugador2.color;
+    colorP1 = player1.color;
+    colorP2 = player2.color;
 
     while(play) {
         playerMoved = false;
-        cuadroSeleccion(X,Y);
+        selectSquare(X,Y);
         printGrid();
-        mover(playerTurn, ptrX, ptrY);
-        revertirCuadro(Xant, Yant);
+        move(playerTurn, ptrX, ptrY);
+        revertSquare(Xant, Yant);
         if(playerMoved) {
             switch(playerTurn) {
                 case 1:

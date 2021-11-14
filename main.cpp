@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-const int UNIT = 8; //Tamaño de caja en la tabla
+const int UNIT = 8; //Size of each square in the board
 const int TWaH = (5*UNIT)+1; //Table Width and Height
 int Xant = 3, Yant = 3; // X anterior, Y anterior
 bool playerMoved;
@@ -15,6 +15,13 @@ struct player {
 
 string colorP1;
 string colorP2;
+
+//Variables declared here are for the messages at the side of the board
+
+int moves = 0;
+string message;
+
+//
 
 int grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
@@ -92,13 +99,13 @@ string interperate(int num) {
             re = colorP2; //#xxxxxx - player chooses color
             break;
         case 7:
-            re = "  "; //#fcdf00 - selector color
+            re = "**"; //#fcdf00 - selector color
             break;
         case 8:
             re = "+ "; //#0000ff - highlight color
             break;
         case 9:
-            re = "=="; //#000000 - black border color
+            re = "  "; //#000000 - black border color
             break;
         default:
             re = "/\\";
@@ -111,6 +118,15 @@ void printGrid() {
     for(int j=0; j<TWaH; j++) {
         for(int i=0; i<TWaH; i++) {
             cout << interperate(grid[j][i]);
+        }
+        cout << "\t\t\t\t";
+        switch(j) {
+            case 0:
+                cout << "Movimientos realizados: " << moves;
+                break;
+            case 5:
+                cout << message;
+                break;
         }
         cout << endl;
     }
@@ -222,6 +238,9 @@ void move(int p, int *x, int *y) {
                 drawPiece(p,*x,*y);
                 gridStats[*x-1][*y-1] = p;
                 playerMoved = true;
+                moves++;
+            } else {
+                message = "No se puede colocar ficha, cuadro ocupado.";
             }
             break;
         case 'm':
@@ -230,6 +249,8 @@ void move(int p, int *x, int *y) {
                 highlightedCoordX = *x;
                 highlightedCoordY = *y;
                 highlightSquare(*x, *y);
+            } else {
+                message = "No puede seleccionar fichas de su oponente, solo fichas suyas.";
             }
             break;
         case 'n':
@@ -243,7 +264,12 @@ void move(int p, int *x, int *y) {
                     playerMoved = true;
                     highlightedCoordX = 0;
                     highlightedCoordY = 0;
+                    moves++;
+                } else {
+                    message = "Solo puede mover a un cuadro directamente encima, debajo o a los costados de su ficha seleccionada.";
                 }
+            } else {
+                message = "No se puede seleccionar un cuadro vacio.";
             }
     }
 }
@@ -274,28 +300,38 @@ int main() {
     colorP1 = player1.color;
     colorP2 = player2.color;
 
+    //For hito 2
+    char listo;
+    cout << "\n\n\nBruce Matias Fleck Ojeda      - U20211E803" << endl << endl;
+    cout << "\n\nEste presente programa para el hito 2 fue hecha solamente en Visual Studio Code en una mac,\npor lo tanto no cuenta con ningun uso de otra libreria o namespace aparte de <iostream> y std." << endl;
+    cout << "\nPara poder realizar cualquier accion dentro del programa ingrese un char seguido de [enter] ya que la programa solo cuenta con el uso de 'cin'." << endl;
+    cout << "\n--Para mover el cuadro de selecion ingrese una de los caracteres [wasd] (seguido por [enter])" << endl;
+    cout << "--Para colocar una ficha ingrese [p] (seguido por [enter])." << endl;
+    cout << "--Para seleccionar una ficha a mover ingrese [m]" << endl;
+    cout << "--Para luego seleccionar el cuadro al que quieres que la ficha se mueva ingrese [n]" << endl;
+    do {
+        cout << "\n\nPara verificar que ha leido las instucciones y esta listo para avanzar al juego por favor ingrese 'l': ";
+        cin >> listo;
+    } while(listo != 'l');
+    cout << endl << endl;
+    //
+
     while(play) {
         playerMoved = false;
         selectSquare(X,Y);
         printGrid();
+        message = "";
         move(playerTurn, ptrX, ptrY);
         revertSquare(Xant, Yant);
-        if(playerMoved) {
-            switch(playerTurn) {
-                case 1:
-                    playerTurn = 2;
-                    break;
-                case 2:
-                    playerTurn = 1;
-                    break;
-            }
-        }
-        //---
-        printGridStats();
-        cout << "Current pos:" << X << " " << Y << endl;
-        cout << "Last pos:" << Xant << " " << Yant << endl;
-        cout << "Highlighted pos:" << highlightedCoordX << " " << highlightedCoordY << endl;
-        cout << "Player " << playerTurn << "'s turn." << endl;
-        //---
+        // if(playerMoved) {
+        //     switch(playerTurn) {
+        //         case 1:
+        //             playerTurn = 2;
+        //             break;
+        //         case 2:
+        //             playerTurn = 1;
+        //             break;
+        //     }
+        // }
     }
 }

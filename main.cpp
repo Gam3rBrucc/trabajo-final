@@ -16,6 +16,13 @@ struct player {
 string colorP1;
 string colorP2;
 
+int moves = 0;
+string message;
+string currentPos;
+string lastPos;
+string highlightedCoords;
+string playerTurnMsg;
+
 int grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
@@ -111,6 +118,37 @@ void printGrid() {
     for(int j=0; j<TWaH; j++) {
         for(int i=0; i<TWaH; i++) {
             cout << interperate(grid[j][i]);
+        }
+        cout << "\t\t";
+        switch(j) {
+            case 0:
+                cout << "Moves made: " << moves;
+                break;
+            case 1:
+                cout << currentPos;
+                break;
+            case 2:
+                cout << lastPos;
+                break;
+            case 3:
+                cout << highlightedCoords;
+                break;
+            case 4:
+                cout << playerTurnMsg;
+                break;
+            case 6:
+                for(int i=0; i<5; i++) cout << "[" << gridStats[0][i] << "] "; break;
+            case 7:
+                for(int i=0; i<5; i++) cout << "[" << gridStats[1][i] << "] "; break;
+            case 8:
+                for(int i=0; i<5; i++) cout << "[" << gridStats[2][i] << "] "; break;
+            case 9:
+                for(int i=0; i<5; i++) cout << "[" << gridStats[3][i] << "] "; break;
+            case 10:
+                for(int i=0; i<5; i++) cout << "[" << gridStats[4][i] << "] "; break;
+            case 13:
+                cout << message;
+                break;
         }
         cout << endl;
     }
@@ -219,9 +257,13 @@ void move(int p, int *x, int *y) {
             break;
         case 'p':
             if(gridStats[*x-1][*y-1] == 0) {
+                moves++;
                 drawPiece(p,*x,*y);
                 gridStats[*x-1][*y-1] = p;
                 playerMoved = true;
+                message = "";
+            } else {
+                message = "You can't place a piece on top of another.";
             }
             break;
         case 'm':
@@ -230,11 +272,18 @@ void move(int p, int *x, int *y) {
                 highlightedCoordX = *x;
                 highlightedCoordY = *y;
                 highlightSquare(*x, *y);
+                message = "";
+            } else if(gridStats[*x-1][*y-1] == 0) {
+                message = "You can't select an empty square.";
+            } else {
+                message = "You can't select your opponents piece.";
             }
             break;
         case 'n':
             if(gridStats[*x-1][*y-1] != 1 && gridStats[*x-1][*y-1] != 2) {
                 if((abs(*x - highlightedCoordX) == 1 && abs(*y - highlightedCoordY) == 0) || (abs(*x - highlightedCoordX) == 0 && abs(*y - highlightedCoordY) == 1)) {
+                    moves++;
+                    message = "";
                     gridStats[*x-1][*y-1] = p;
                     gridStats[highlightedCoordX-1][highlightedCoordY-1] = 0;
                     drawPiece(p, *x, *y);
@@ -243,21 +292,14 @@ void move(int p, int *x, int *y) {
                     playerMoved = true;
                     highlightedCoordX = 0;
                     highlightedCoordY = 0;
+                } else {
+                    message = "You can only move to a square dirrectly above, bellow or to the sides of your selected piece.";
                 }
+            } else {
+                message = "You can't move a piece on top of another.";
             }
     }
 }
-
-//temporary funcion
-void printGridStats() {
-    for(int j=0; j<5; j++) {
-        for(int i=0; i<5; i++) {
-            cout << "[" << gridStats[j][i] << "] ";
-        }
-        cout << endl;
-    }
-}
-
 
 int main() {
     bool play = true;
@@ -275,6 +317,14 @@ int main() {
     colorP2 = player2.color;
 
     while(play) {
+
+        //---
+        currentPos = "Current position: " + to_string(X) + ", " + to_string(Y);
+        lastPos = "Last position: " + to_string(Xant) + ", " + to_string(Yant);
+        highlightedCoords = "Highlighted coordinates: " + to_string(highlightedCoordX) + ", " + to_string(highlightedCoordY);
+        playerTurnMsg = "Player " + to_string(playerTurn) + "'s turn.";
+        //---
+
         playerMoved = false;
         selectSquare(X,Y);
         printGrid();
@@ -290,12 +340,5 @@ int main() {
                     break;
             }
         }
-        //---
-        printGridStats();
-        cout << "Current pos:" << X << " " << Y << endl;
-        cout << "Last pos:" << Xant << " " << Yant << endl;
-        cout << "Highlighted pos:" << highlightedCoordX << " " << highlightedCoordY << endl;
-        cout << "Player " << playerTurn << "'s turn." << endl;
-        //---
     }
 }

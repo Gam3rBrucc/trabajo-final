@@ -1,26 +1,28 @@
 #include <iostream>
+#include <string>
+#include <conio.h>
 using namespace std;
+using namespace System;
 
-const int UNIT = 8; //Tamaño de caja en la tabla
-const int TWaH = (5*UNIT)+1; //Table Width and Height
+const int UNIT = 8; // Size of a square
+const int TWaH = (5 * UNIT) + 1; // Board Width and Height
 int Xant = 3, Yant = 3; // X anterior, Y anterior
+int xHighlight = 0, yHighlight = 0;
 bool playerMoved;
-int highlightedCoordX = 0, highlightedCoordY = 0;
 
 struct player {
     string name;
-    string color;
+    char color;
     int captured_pieces;
+    int moves = 0;
 };
 
-string colorP1;
-string colorP2;
+player p1;
+player p2;
 
 int moves = 0;
-string message;
-string currentPos;
-string lastPos;
-string highlightedCoords;
+string message1;
+string message2;
 string playerTurnMsg;
 
 int grid[TWaH][TWaH] = {
@@ -83,262 +85,358 @@ int gridBackground[5][5] = {
     {1,0,1,0,1}
 };
 
-string interperate(int num) {
-    string re; //vaiable to REturn
-    switch(num) {
-        case 0:
-            re = "!!"; //#c7c7c7 - light square color
-            break;
-        case 1:
-            re = "OO"; //#751616 - dark square color
-            break;
-        case 2:
-            re = colorP1; //#xxxxxx - player chooses color
-            break;
-        case 3:
-            re = colorP2; //#xxxxxx - player chooses color
-            break;
-        case 7:
-            re = "  "; //#fcdf00 - selector color
-            break;
-        case 8:
-            re = "+ "; //#0000ff - highlight color
-            break;
-        case 9:
-            re = "=="; //#000000 - black border color
-            break;
-        default:
-            re = "/\\";
-            break;
+void interperate(int num) {
+    switch (num) {
+    case 0:
+        Console::ForegroundColor = ConsoleColor::Cyan; // Light square filling
+        cout << char(219) << char(219);
+        break;
+    case 1:
+        Console::ForegroundColor = ConsoleColor::Black; // Dark square filling
+        cout << char(219) << char(219);
+        break;
+    case 2:
+        //Player 1 chosen color
+        break;
+    case 3:
+        //Player 2 chosen color
+        break;
+    case 9:
+        Console::ForegroundColor = ConsoleColor::DarkGray; // Inbetween square filling
+        cout << char(219) << char(219);
+        break;
     }
-    return re;
+
 }
 
 void printGrid() {
-    for(int j=0; j<TWaH; j++) {
-        for(int i=0; i<TWaH; i++) {
-            cout << interperate(grid[j][i]);
-        }
-        cout << "\t\t";
-        switch(j) {
-            case 0:
-                cout << "Moves made: " << moves;
-                break;
-            case 1:
-                cout << currentPos;
-                break;
-            case 2:
-                cout << lastPos;
-                break;
-            case 3:
-                cout << highlightedCoords;
-                break;
-            case 4:
-                cout << playerTurnMsg;
-                break;
-            case 6:
-                for(int i=0; i<5; i++) cout << "[" << gridStats[0][i] << "] "; break;
-            case 7:
-                for(int i=0; i<5; i++) cout << "[" << gridStats[1][i] << "] "; break;
-            case 8:
-                for(int i=0; i<5; i++) cout << "[" << gridStats[2][i] << "] "; break;
-            case 9:
-                for(int i=0; i<5; i++) cout << "[" << gridStats[3][i] << "] "; break;
-            case 10:
-                for(int i=0; i<5; i++) cout << "[" << gridStats[4][i] << "] "; break;
-            case 13:
-                cout << message;
-                break;
+    for (int j = 0; j < TWaH; j++) {
+        for (int i = 0; i < TWaH; i++) {
+            interperate(grid[j][i]);
         }
         cout << endl;
     }
 }
 
-void selectSquare(int x, int y) {
-    int startPosX = UNIT * (x-1);
-    int startPosY = UNIT * (y-1);
-    for(int i=0; i<9; i++) {
-        grid[startPosX][startPosY + i] = 7;
-        grid[startPosX + i][startPosY] = 7;
-        grid[startPosX + i][startPosY + UNIT] = 7;
-        grid[startPosX + UNIT][startPosY + i] = 7;
+void drawSelector(int x, int y) { // x = rows, y = columns
+    Console::ForegroundColor = ConsoleColor::Yellow;
+    int xStartPos = UNIT * (x - 1);
+    int yStartPos = UNIT * (y - 1) * 2;
+    for (int i = 0; i < (UNIT + 1); i++) {
+        // SetCursosPosition parameters are (COLUMNS, ROWS)
+        Console::SetCursorPosition(yStartPos + (i * 2), xStartPos); // Top side
+        cout << char(219) << char(219);
+        Console::SetCursorPosition(yStartPos, xStartPos + i); // Left Side
+        cout << char(219) << char(219);
+        Console::SetCursorPosition(yStartPos + (UNIT * 2), xStartPos + i); // Right side
+        cout << char(219) << char(219);
+        Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + UNIT);
+        cout << char(219) << char(219);
     }
 }
 
-void revertSquare(int x, int y) {
-    int startPosX = UNIT * (x-1);
-    int startPosY = UNIT * (y-1);
-    for(int i=0; i<9; i++) {
-        grid[startPosX][startPosY + i] = 9;
-        grid[startPosX + i][startPosY] = 9;
-        grid[startPosX + i][startPosY + UNIT] = 9;
-        grid[startPosX + UNIT][startPosY + i] = 9;
+void erraseSelector(int x, int y) { // x = rows, y = columns
+    Console::ForegroundColor = ConsoleColor::DarkGray;
+    int xStartPos = UNIT * (x - 1);
+    int yStartPos = UNIT * (y - 1) * 2;
+    for (int i = 0; i < (UNIT + 1); i++) {
+        // SetCursosPosition parameters are (COLUMNS, ROWS)
+        Console::SetCursorPosition(yStartPos + (i * 2), xStartPos); // Top side
+        cout << char(219) << char(219);
+        Console::SetCursorPosition(yStartPos, xStartPos + i); // Left Side
+        cout << char(219) << char(219);
+        Console::SetCursorPosition(yStartPos + (UNIT * 2), xStartPos + i); // Right side
+        cout << char(219) << char(219);
+        Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + UNIT);
+        cout << char(219) << char(219);
     }
 }
 
-void drawPiece(int p, int x, int y) {
-    int player;
-    int startPosX = UNIT * (x-1) + 2;
-    int startPosY = UNIT * (y-1) + 2;
-    switch(p) {
-        case 1:
-            player = 2;
-            break;
-        case 2:
-            player = 3;
-            break;
+void placeP1Piece(int x, int y) {
+    int xStartPos = UNIT * (x - 1) + 2;
+    int yStartPos = 2 * UNIT * (y - 1) + 2;
+    switch (p1.color) {
+    case 'Y':
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        break;
+    case 'R':
+        Console::ForegroundColor = ConsoleColor::Red;
+        break;
     }
-    for(int j=0; j<5; j++) {
-        for(int i=0; i<5; i++) {
-            if(j == 0 && i == 0) {
-            }else if(j == 0 && i == 4) {
-            } else if(j == 4 && i == 0) {
-            } else if(j == 4 && i == 4) {
-            } else {
-                grid[startPosX + j][startPosY + i] = player;
+    for (int j = 0; j < 5; j++) {
+        for (int i = 1; i <= 5; i++) {
+            if ((i == 1 || i == 5) && j == 0) {
+            }
+            else if ((i == 1 || i == 5) && j == 4) {
+            }
+            else {
+                grid[xStartPos + j][yStartPos + i] = 2;
+                Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
+                cout << char(219) << char(219);
             }
         }
     }
 }
 
-void errasePiece(int x, int y) {
-    int startPosX = UNIT * (x-1) + 2;
-    int startPosY = UNIT * (y-1) + 2;
-    for(int j=0; j<5; j++) {
-        for(int i=0; i<5; i++) {
-            grid[startPosX + j][startPosY + i] = gridBackground[x-1][y-1];
-        }
+void placeP2Piece(int x, int y) {
+    int xStartPos = UNIT * (x - 1) + 2;
+    int yStartPos = 2 * UNIT * (y - 1) + 2;
+    switch (p2.color) {
+    case 'W':
+        Console::ForegroundColor = ConsoleColor::White;
+        break;
+    case 'M':
+        Console::ForegroundColor = ConsoleColor::Magenta;
+        break;
     }
-}
-
-void highlightSquare(int x, int y) {
-    int startPosX = UNIT * (x-1) + 1;
-    int startPosY = UNIT * (y-1) + 1;
-    for(int j=0; j<7; j++) {
-        for(int i=0; i<7; i++) {
-            if(grid[startPosX+j][startPosY+i] != 2 && grid[startPosX+j][startPosY+i] != 3) {
-                grid[startPosX+j][startPosY+i] = 8;
+    for (int j = 0; j < 5; j++) {
+        for (int i = 1; i <= 5; i++) {
+            if ((i == 1 || i == 5) && j == 0) {
+            }
+            else if ((i == 1 || i == 5) && j == 4) {
+            }
+            else {
+                grid[xStartPos + j][yStartPos + i] = 3;
+                Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
+                cout << char(219) << char(219);
             }
         }
     }
 }
 
-void unHighlightSquare(int x, int y) {
-    int startPosX = UNIT * (x-1) + 1;
-    int startPosY = UNIT * (y-1) + 1;
-    if(x != 0 && y != 0) {
-        for(int j=0; j<7; j++) {
-            for(int i=0; i<7; i++) {
-                if(grid[startPosX+j][startPosY+i] != 2 && grid[startPosX+j][startPosY+i] != 3) {
-                    grid[startPosX+j][startPosY+i] = gridBackground[x-1][y-1];
-                }
-            }
+void highlight(int x, int y) {
+    int xStartPos = UNIT * (x - 1) + 1;
+    int yStartPos = 2 * UNIT * (y - 1) + 2;
+    Console::ForegroundColor = ConsoleColor::Blue;
+    for (int j = 0; j < 7; j++) {
+        for (int i = 0; i < 7; i++) {
+            Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
+            cout << char(219) << char(219);
         }
     }
 }
 
-void move(int p, int *x, int *y) {
+void unHighlight(int x, int y) {
+    int xStartPos = UNIT * (x - 1) + 1;
+    int yStartPos = 2 * UNIT * (y - 1) + 2;
+    switch (gridBackground[x - 1][y - 1]) {
+    case 0:
+        Console::ForegroundColor = ConsoleColor::Cyan;
+        break;
+    case 1:
+        Console::ForegroundColor = ConsoleColor::Black;
+        break;
+    }
+    for (int j = 0; j < 7; j++) {
+        for (int i = 0; i < 7; i++) {
+            Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
+            cout << char(219) << char(219);
+        }
+    }
+}
+
+void drawStatsBoard(int p) {
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::SetCursorPosition((TWaH * 2)+ 5, 0);
+    cout << p1.name << " moves: " << p1.moves;
+    Console::SetCursorPosition((TWaH * 2) + 5, 1);
+    cout << p2.name << " moves: " << p2.moves;
+    Console::SetCursorPosition((TWaH * 2) + 5, 3);
+    cout << "It is ";
+    switch (p) {
+    case 1:
+        cout << p1.name;
+        break;
+    case 2:
+        cout << p2.name;
+        break;
+    }
+    cout << "'s turn.";
+    for (int i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 5);
+        cout << "[" << gridStats[0][i] << "] ";
+    }
+    for (int i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 6);
+        cout << "[" << gridStats[1][i] << "] ";
+    }
+    for (int i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 7);
+        cout << "[" << gridStats[2][i] << "] ";
+    }
+    for (int i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 8);
+        cout << "[" << gridStats[3][i] << "] ";
+    }
+    for (int i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 9);
+        cout << "[" << gridStats[4][i] << "] ";
+    }
+    if (message1 == "" && message2 == "") {
+        Console::SetCursorPosition((TWaH * 2) + 5, 11);
+        cout << "                                                 ";
+        Console::SetCursorPosition((TWaH * 2) + 5, 12);
+        cout << "                                                 ";
+    }
+    else {
+        Console::SetCursorPosition((TWaH * 2) + 5, 11);
+        cout << message1;
+        Console::SetCursorPosition((TWaH * 2) + 5, 12);
+        cout << message2;
+    }
+}
+
+void move(int* x, int* y, int p) {
     char key;
-    Xant = *x;
-    Yant = *y;
-    cin >> key;
-    switch(key) {
-        case 'w':
-            if(*x != 1) *x = *x - 1;
+    Xant = *x, Yant = *y;
+    if (_kbhit) {
+        key = toupper(getch());
+        switch (key) {
+        case 72: // Up arrow
+            if (*x - 1 != 0) *x = *x - 1;
             break;
-        case 'a':
-            if(*y != 1) *y = *y - 1;
+        case 75: // Left arrow
+            if (*y - 1 != 0) *y = *y - 1;
             break;
-        case 's':
-            if(*x != 5) *x = *x + 1;
+        case 80: // Down arrow
+            if (*x - 1 != 4) *x = *x + 1;
             break;
-        case 'd':
-            if(*y != 5) *y = *y + 1;
+        case 77: // Right arrow
+            if (*y - 1 != 4) *y = *y + 1;
             break;
-        case 'p':
-            if(gridStats[*x-1][*y-1] == 0) {
-                moves++;
-                drawPiece(p,*x,*y);
-                gridStats[*x-1][*y-1] = p;
-                playerMoved = true;
-                message = "";
-            } else {
-                message = "You can't place a piece on top of another.";
-            }
-            break;
-        case 'm':
-            if(gridStats[*x-1][*y-1] == p) {
-                unHighlightSquare(highlightedCoordX, highlightedCoordY);
-                highlightedCoordX = *x;
-                highlightedCoordY = *y;
-                highlightSquare(*x, *y);
-                message = "";
-            } else if(gridStats[*x-1][*y-1] == 0) {
-                message = "You can't select an empty square.";
-            } else {
-                message = "You can't select your opponents piece.";
-            }
-            break;
-        case 'n':
-            if(gridStats[*x-1][*y-1] != 1 && gridStats[*x-1][*y-1] != 2) {
-                if((abs(*x - highlightedCoordX) == 1 && abs(*y - highlightedCoordY) == 0) || (abs(*x - highlightedCoordX) == 0 && abs(*y - highlightedCoordY) == 1)) {
-                    moves++;
-                    message = "";
-                    gridStats[*x-1][*y-1] = p;
-                    gridStats[highlightedCoordX-1][highlightedCoordY-1] = 0;
-                    drawPiece(p, *x, *y);
-                    unHighlightSquare(highlightedCoordX, highlightedCoordY);
-                    errasePiece(highlightedCoordX, highlightedCoordY);
-                    playerMoved = true;
-                    highlightedCoordX = 0;
-                    highlightedCoordY = 0;
-                } else {
-                    message = "You can only move to a square dirrectly above, bellow or to the sides of your selected piece.";
+        case 'Z': // Place piece
+            if (gridStats[*x - 1][*y - 1] == 0) {
+                switch (p) {
+                case 1:
+                    placeP1Piece(*x, *y);
+                    p1.moves++;
+                    break;
+                case 2:
+                    placeP2Piece(*x, *y);
+                    p2.moves++;
+                    break;
                 }
-            } else {
-                message = "You can't move a piece on top of another.";
+                gridStats[*x - 1][*y - 1] = p;
+                playerMoved = true;
+                message1 = "";
+                message2 = "";
             }
+            else {
+                message1 = "You can't place a piece on top of another.";
+                message2 = "";
+            }
+            break;
+        case 'X': // Select piece
+            if (gridStats[*x - 1][*y - 1] == p) {
+                if (xHighlight != 0 || yHighlight != 0) {
+                    unHighlight(xHighlight, yHighlight);
+                    switch (p) {
+                    case 1:
+                        placeP1Piece(xHighlight, yHighlight);
+                        break;
+                    case 2:
+                        placeP2Piece(xHighlight, yHighlight);
+                        break;
+                    }
+                }
+                xHighlight = *x;
+                yHighlight = *y;
+                highlight(*x, *y);
+                switch (p) {
+                case 1:
+                    placeP1Piece(*x, *y);
+                    break;
+                case 2:
+                    placeP2Piece(*x, *y);
+                    break;
+                }
+            }
+            else if (gridStats[*x - 1][*y - 1] == 0) {
+                message1 = "You can't select an empty square.";
+                message2 = "";
+            }
+            else {
+                message1 = "You can't select your opponents piece.";
+                message2 = "";
+            }
+            break;
+        case 'C': // Move piece
+            if (gridStats[*x - 1][*y - 1] != 1 && gridStats[*x - 1][*y - 1] != 2) {
+                if ((abs(*x - xHighlight) == 1 && abs(*y - yHighlight) == 0) || (abs(*x - xHighlight) == 0 && abs(*y - yHighlight) == 1)) {
+                    message1 = "";
+                    message2 = "";
+                    gridStats[*x - 1][*y - 1] = p;
+                    gridStats[xHighlight - 1][yHighlight - 1] = 0;
+                    switch (p) {
+                    case 1:
+                        placeP1Piece(*x, *y);
+                        break;
+                    case 2:
+                        placeP2Piece(*x, *y);
+                        break;
+                    }
+                    unHighlight(xHighlight, yHighlight);
+                    playerMoved = true;
+                    xHighlight = 0;
+                    yHighlight = 0;
+                }
+                else if (xHighlight == 0 && yHighlight == 0) {
+                    message1 = "You have to select a piece first in order";
+                    message2 = "to move it.";
+                }
+                else {
+                    message1 = "You can only move to a square dirrectly above,";
+                    message2 = "bellow or to the sides of your selected piece.";
+                }
+            }
+            else {
+                message1 = "You can't place move a piece on top of another.";
+                message2 = "";
+            }
+            break;
+        }
     }
 }
 
 int main() {
-    bool play = true;
+    Console::CursorVisible = false;
+    Console::SetWindowSize(150, 50);
+
+    int x = 3, y = 3;
     int playerTurn = 1;
-    int X = 3, Y = 3;
-    int *ptrX = &X;
-    int *ptrY = &Y;
-    player player1;
-    player player2;
 
-    player1.color = "1 ";
-    player2.color = "2 ";
+    // PRE-GAME
+    p1.name = "Bruce";
+    p2.name = "Angelis";
+    p1.color = 'R';
+    p2.color = 'M';
+    // GAME
+    printGrid();
 
-    colorP1 = player1.color;
-    colorP2 = player2.color;
+    while (true) {
+        // Stat board message updates
+        
 
-    while(play) {
-
-        //---
-        currentPos = "Current position: " + to_string(X) + ", " + to_string(Y);
-        lastPos = "Last position: " + to_string(Xant) + ", " + to_string(Yant);
-        highlightedCoords = "Highlighted coordinates: " + to_string(highlightedCoordX) + ", " + to_string(highlightedCoordY);
-        playerTurnMsg = "Player " + to_string(playerTurn) + "'s turn.";
-        //---
-
+        // Game updates
         playerMoved = false;
-        selectSquare(X,Y);
-        printGrid();
-        move(playerTurn, ptrX, ptrY);
-        revertSquare(Xant, Yant);
-        if(playerMoved) {
-            switch(playerTurn) {
-                case 1:
-                    playerTurn = 2;
-                    break;
-                case 2:
-                    playerTurn = 1;
-                    break;
+
+        drawStatsBoard(playerTurn);
+        drawSelector(x, y);
+        move(&x, &y, playerTurn);
+        erraseSelector(Xant, Yant);
+
+        if (playerMoved) {
+            switch (playerTurn) {
+            case 1:
+                playerTurn = 2;
+                break;
+            case 2:
+                playerTurn = 1;
+                break;
             }
         }
     }
+
+    // POST-GAME
+    getch();
 }

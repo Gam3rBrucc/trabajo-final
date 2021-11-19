@@ -25,6 +25,35 @@ string message1;
 string message2;
 string playerTurnMsg;
 
+int UPC_logo[26][21] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0,0,1,0,0,0},
+    {0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0,0,1,0,0,0},
+    {0,0,1,1,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,0,0},
+    {0,0,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0},
+    {0,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,1,1,1,0},
+    {0,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,0},
+    {0,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,0},
+    {0,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,0},
+    {0,1,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,0},
+    {0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,0},
+    {0,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0,1,1,1,1,0},
+    {0,1,1,1,1,1,0,0,0,0,1,0,0,0,0,1,1,1,1,1,0},
+    {0,1,1,1,1,1,1,1,0,0,1,0,0,1,1,1,1,1,1,1,0},
+    {0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+    {0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0},
+    {0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+    {0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+    {0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0},
+    {0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
 int grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
@@ -85,6 +114,30 @@ int gridBackground[5][5] = {
     {1,0,1,0,1}
 };
 
+void drawLogo() {
+    for (int j = 0; j < 26; j++) {
+        for (int i = 0; i < 21; i++) {
+            if(UPC_logo[j][i] == 1) {
+                Console::ForegroundColor = ConsoleColor::Red;
+                Console::SetCursorPosition((i * 2), j);
+                cout << char(219) << char(219);
+            }
+        }
+    }
+}
+
+void erraseLogo() {
+    for (int j = 0; j < 26; j++) {
+        for (int i = 0; i < 21; i++) {
+            if (UPC_logo[j][i] == 1) {
+                //Console::ForegroundColor = ConsoleColor::Black;
+                Console::SetCursorPosition((i * 2), j);
+                cout << "  ";
+            }
+        }
+    }
+}
+
 void interperate(int num) {
     switch (num) {
     case 0:
@@ -112,6 +165,7 @@ void interperate(int num) {
 void printGrid() {
     for (int j = 0; j < TWaH; j++) {
         for (int i = 0; i < TWaH; i++) {
+            Console::SetCursorPosition((i * 2), j);
             interperate(grid[j][i]);
         }
         cout << endl;
@@ -242,6 +296,8 @@ void drawStatsBoard(int p) {
     Console::SetCursorPosition((TWaH * 2) + 5, 1);
     cout << p2.name << " moves: " << p2.moves;
     Console::SetCursorPosition((TWaH * 2) + 5, 3);
+    cout << "                                  ";
+    Console::SetCursorPosition((TWaH * 2) + 5, 3);
     cout << "It is ";
     switch (p) {
     case 1:
@@ -272,18 +328,14 @@ void drawStatsBoard(int p) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 9);
         cout << "[" << gridStats[4][i] << "] ";
     }
-    if (message1 == "" && message2 == "") {
-        Console::SetCursorPosition((TWaH * 2) + 5, 11);
-        cout << "                                                 ";
-        Console::SetCursorPosition((TWaH * 2) + 5, 12);
-        cout << "                                                 ";
-    }
-    else {
-        Console::SetCursorPosition((TWaH * 2) + 5, 11);
-        cout << message1;
-        Console::SetCursorPosition((TWaH * 2) + 5, 12);
-        cout << message2;
-    }
+    Console::SetCursorPosition((TWaH * 2) + 5, 11);
+    cout << "                                                                   ";
+    Console::SetCursorPosition((TWaH * 2) + 5, 12);
+    cout << "                                                                   ";
+    Console::SetCursorPosition((TWaH * 2) + 5, 11);
+    cout << message1;
+    Console::SetCursorPosition((TWaH * 2) + 5, 12);
+    cout << message2;
 }
 
 void move(int* x, int* y, int p) {
@@ -327,46 +379,22 @@ void move(int* x, int* y, int p) {
             }
             break;
         case 'X': // Select piece
-            if (gridStats[*x - 1][*y - 1] == p) {
-                if (xHighlight != 0 || yHighlight != 0) {
-                    unHighlight(xHighlight, yHighlight);
-                    switch (p) {
-                    case 1:
-                        placeP1Piece(xHighlight, yHighlight);
-                        break;
-                    case 2:
-                        placeP2Piece(xHighlight, yHighlight);
-                        break;
+            if (xHighlight == 0 && yHighlight == 0) {
+                if (gridStats[*x - 1][*y - 1] == p) {
+                    if (xHighlight != 0 || yHighlight != 0) {
+                        unHighlight(xHighlight, yHighlight);
+                        switch (p) {
+                        case 1:
+                            placeP1Piece(xHighlight, yHighlight);
+                            break;
+                        case 2:
+                            placeP2Piece(xHighlight, yHighlight);
+                            break;
+                        }
                     }
-                }
-                xHighlight = *x;
-                yHighlight = *y;
-                highlight(*x, *y);
-                switch (p) {
-                case 1:
-                    placeP1Piece(*x, *y);
-                    break;
-                case 2:
-                    placeP2Piece(*x, *y);
-                    break;
-                }
-            }
-            else if (gridStats[*x - 1][*y - 1] == 0) {
-                message1 = "You can't select an empty square.";
-                message2 = "";
-            }
-            else {
-                message1 = "You can't select your opponents piece.";
-                message2 = "";
-            }
-            break;
-        case 'C': // Move piece
-            if (gridStats[*x - 1][*y - 1] != 1 && gridStats[*x - 1][*y - 1] != 2) {
-                if ((abs(*x - xHighlight) == 1 && abs(*y - yHighlight) == 0) || (abs(*x - xHighlight) == 0 && abs(*y - yHighlight) == 1)) {
-                    message1 = "";
-                    message2 = "";
-                    gridStats[*x - 1][*y - 1] = p;
-                    gridStats[xHighlight - 1][yHighlight - 1] = 0;
+                    xHighlight = *x;
+                    yHighlight = *y;
+                    highlight(*x, *y);
                     switch (p) {
                     case 1:
                         placeP1Piece(*x, *y);
@@ -375,23 +403,50 @@ void move(int* x, int* y, int p) {
                         placeP2Piece(*x, *y);
                         break;
                     }
-                    unHighlight(xHighlight, yHighlight);
-                    playerMoved = true;
-                    xHighlight = 0;
-                    yHighlight = 0;
                 }
-                else if (xHighlight == 0 && yHighlight == 0) {
-                    message1 = "You have to select a piece first in order";
-                    message2 = "to move it.";
+                else if (gridStats[*x - 1][*y - 1] == 0) {
+                    message1 = "You can't select an empty square.";
+                    message2 = "";
                 }
                 else {
-                    message1 = "You can only move to a square dirrectly above,";
-                    message2 = "bellow or to the sides of your selected piece.";
+                    message1 = "You can't select your opponents piece.";
+                    message2 = "";
                 }
             }
-            else {
-                message1 = "You can't place move a piece on top of another.";
-                message2 = "";
+            else { // Moves a piece
+                if (gridStats[*x - 1][*y - 1] != 1 && gridStats[*x - 1][*y - 1] != 2) {
+                    if ((abs(*x - xHighlight) == 1 && abs(*y - yHighlight) == 0) || (abs(*x - xHighlight) == 0 && abs(*y - yHighlight) == 1)) {
+                        message1 = "";
+                        message2 = "";
+                        gridStats[*x - 1][*y - 1] = p;
+                        gridStats[xHighlight - 1][yHighlight - 1] = 0;
+                        switch (p) {
+                        case 1:
+                            placeP1Piece(*x, *y);
+                            break;
+                        case 2:
+                            placeP2Piece(*x, *y);
+                            break;
+                        }
+                        unHighlight(xHighlight, yHighlight);
+                        playerMoved = true;
+                        xHighlight = 0;
+                        yHighlight = 0;
+                    }
+                    else if (xHighlight == 0 && yHighlight == 0) {
+                        message1 = "You have to select a piece first in order";
+                        message2 = "to move it.";
+                    }
+                    else {
+                        message1 = "You can only move to a square dirrectly above,";
+                        message2 = "bellow or to the sides of your selected piece.";
+                    }
+                }
+                else {
+                    message1 = "You can't place move a piece on top of another.";
+                    message2 = "";
+                }
+                break;
             }
             break;
         }
@@ -400,12 +455,16 @@ void move(int* x, int* y, int p) {
 
 int main() {
     Console::CursorVisible = false;
-    Console::SetWindowSize(150, 50);
+    Console::SetWindowSize(175, 50);
 
     int x = 3, y = 3;
     int playerTurn = 1;
 
     // PRE-GAME
+    drawLogo();
+    getch();
+    erraseLogo();
+
     p1.name = "Bruce";
     p2.name = "Angelis";
     p1.color = 'R';
@@ -414,9 +473,7 @@ int main() {
     printGrid();
 
     while (true) {
-        // Stat board message updates
         
-
         // Game updates
         playerMoved = false;
 

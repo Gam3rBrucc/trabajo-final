@@ -54,6 +54,18 @@ int UPC_logo[26][21] = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
+int seega_banner[9][24] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,0},
+    {0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1,0},
+    {0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1,0},
+    {0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,1,0,1,1,1,1,0},
+    {0,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0},
+    {0,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0},
+    {0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,0,1,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
 int grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
@@ -115,27 +127,164 @@ int gridBackground[5][5] = {
 };
 
 void drawLogo() {
+    int k;
     for (int j = 0; j < 26; j++) {
-        for (int i = 0; i < 21; i++) {
-            if(UPC_logo[j][i] == 1) {
+        k = 0;
+        for (int i = 31; i < 21+31; i++) {
+            if(UPC_logo[j][k] == 1) {
                 Console::ForegroundColor = ConsoleColor::Red;
                 Console::SetCursorPosition((i * 2), j);
                 cout << char(219) << char(219);
             }
+            k++;
         }
     }
 }
 
 void erraseLogo() {
+    int k;
     for (int j = 0; j < 26; j++) {
-        for (int i = 0; i < 21; i++) {
-            if (UPC_logo[j][i] == 1) {
-                //Console::ForegroundColor = ConsoleColor::Black;
+        k = 0;
+        for (int i = 31; i < 21+31; i++) {
+            if (UPC_logo[j][k] == 1) {
                 Console::SetCursorPosition((i * 2), j);
                 cout << "  ";
             }
+            k++;
         }
     }
+}
+
+void drawBanner() {
+    int k, l;
+    k = 0;
+    for (int j = 27; j < 9+27; j++) {
+        l = 0;
+        for (int i = 29; i < 24+29; i++) {
+            if (seega_banner[k][l] == 0) {
+                Console::ForegroundColor = ConsoleColor::White;
+                Console::SetCursorPosition((i * 2), j);
+                cout << char(219) << char(219);
+            }
+            l++;
+        }
+        k++;
+    }
+    Console::ForegroundColor = ConsoleColor::Yellow;
+    Console::SetCursorPosition(55, 41);
+    cout << "Elaborado por Bruce Matias Fleck Ojeda   -   U20211E803";
+    Console::ForegroundColor = ConsoleColor::DarkGray;
+    Console::SetCursorPosition(60, 44);
+    cout << "Precione cualquier tecla para continuar...";
+}
+
+void erraseBanner() {
+    int k, l;
+    k = 0;
+    for (int j = 27; j < 9+27; j++) {
+        l = 0;
+        for (int i = 29; i < 24+29; i++) {
+            if (seega_banner[k][l] == 0) {
+                Console::SetCursorPosition((i * 2), j);
+                cout << "  ";
+            }
+            l++;
+        }
+        k++;
+    }
+    Console::SetCursorPosition(55, 41);
+    cout << "                                                            ";
+    Console::SetCursorPosition(60, 44);
+    cout << "                                                  ";
+}
+
+void instructions() {
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::SetCursorPosition(59, 2);
+    cout << "------------------ INSTRUCCIONES DEL JUEGO ------------------";
+    Console::SetCursorPosition(45, 5);
+    cout << "Seega (tambien conocido como siga, sega o sipu) es un juego de mesa de origen";
+    Console::SetCursorPosition(45, 6);
+    cout << "Epipcio que consiste de dos jugadores con 12 fichas cada uno intentando capturar";
+    Console::SetCursorPosition(45, 7);
+    cout << "todas las fichas de su oponente. El juego se realiza en un tablero de 5x5";
+    Console::SetCursorPosition(45, 9);
+    cout << "El juego se divide en dos fases:";
+    Console::SetCursorPosition(45, 11);
+    cout << "Primera fase.";
+    Console::SetCursorPosition(45, 13);
+    cout << char(46) << " Los dos jugadores, por turno, van colocando 2 fichas sobre cualquier casilla";
+    Console::SetCursorPosition(47, 14);
+    cout << "vacia salvo la del centro. La casilla del centro estara vacia hasta la segunda fase del juego.";
+    Console::SetCursorPosition(45, 16);
+    cout << "Segunda fase.";
+    Console::SetCursorPosition(45, 18);
+    cout << char(46) << " El jugador que coloca sus 2 últimas fichas es quien comienza la segunda fase.";
+    Console::SetCursorPosition(45, 19);
+    cout << char(46) << " Alternativamente se va desplazando una ficha a cualquier casilla contigua libre,";
+    Console::SetCursorPosition(47, 20);
+    cout << "comprendida la del centro, en vertical u horizontal, pero no en diagonal.";
+    Console::SetCursorPosition(45, 21);
+    cout << char(46) << " Una ficha es capturada y removida si esta es encerrada entre dos fichas contrarias";
+    Console::SetCursorPosition(47, 22);
+    cout << "(no en sentido diagonal).";
+    Console::SetCursorPosition(45, 23);
+    cout << char(46) << " Un solo movimiento puede implicar el encierro y la captura de varias piezas a la vez.";
+    Console::SetCursorPosition(45, 24);
+    cout << char(46) << " El jugador que realiza una captura puede seguir moviendo la misma ficha que realizo";
+    Console::SetCursorPosition(47, 25);
+    cout << "el ultimo movimiento mientras siga capturando.";
+    Console::SetCursorPosition(45, 26);
+    cout << char(46) << " Una ficha que se coloca voluntariamente entre dos fichas enemigas no es capturada,";
+    Console::SetCursorPosition(47, 27);
+    cout << "salvo si una de las piezas enemigas se retira y vuelve.";
+    Console::SetCursorPosition(45, 28);
+    cout << char(46) << " La ficha que ocupa la casilla central no puede ser capturada.";
+    Console::SetCursorPosition(45, 29);
+    cout << char(46) << " Cuando un jugador no puede mover le pasa el turno, al contrario.";
+    Console::SetCursorPosition(45, 30);
+    cout << char(46) << " Se gana si se capturan todas las fichas contrarias.";
+    Console::SetCursorPosition(45, 31);
+    cout << char(46) << " Cada jugador puede construir una barrera (o muro) con fichas detrás de la cual";
+    Console::SetCursorPosition(47, 32);
+    cout << "solo se encuentran sus propias fichas que pueden moverse sin peligro de ser capturadas.";
+    Console::SetCursorPosition(45, 33);
+    cout << char(46) << " En el caso de existir una barrera gana el jugador que tiene la mayor cantidad de fichas,";
+    Console::SetCursorPosition(47, 34);
+    cout << "si tienen la misma cantidad es un empate.";
+    Console::ForegroundColor = ConsoleColor::DarkGray;
+    Console::SetCursorPosition(69, 37);
+    cout << "Precione cualquier tecla para continuar...";
+}
+
+void erraseInstructions() {
+    for (int i = 2; i < 38; i++) {
+        Console::ForegroundColor = ConsoleColor::Black;
+        Console::SetCursorPosition(40, i);
+        cout << "                                                                                                                      ";
+    }
+}
+
+void drawPlayerInstructions() {
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::SetCursorPosition(38, 2);
+    cout << "---------------------------------- INSTRUCCIONES PARA EL JUGADOR -------------------------------------";
+    Console::SetCursorPosition(45, 4);
+    cout << "Durante el juego podras escojer donde colocar o mover una ficha por medio de un cuadrado selecionador";
+    Console::SetCursorPosition(45, 5);
+    cout << "de color ";
+    Console::ForegroundColor = ConsoleColor::Yellow;
+    cout << "amarillo";
+    Console::ForegroundColor = ConsoleColor::White;
+    cout << " y se mueve usando las teclas de flechas.";
+    Console::SetCursorPosition(45, 7);
+    cout << "Para colocar una ficha dirije el seleccionador a la casilla que quieras y presiona la tecla [z]";
+    Console::SetCursorPosition(45, 8);
+    cout << "Para mover una ficha seleccionalo usando la tecla [x], luego dirijete a la casilla donde quieras";
+    Console::SetCursorPosition(45, 9);
+    cout << "mover la ficha u presiona [x] de nuevo.";
+    Console::SetCursorPosition(69, 12);
+    cout << "Precione cualquier tecla para continuar...";
 }
 
 void interperate(int num) {
@@ -461,9 +610,19 @@ int main() {
     int playerTurn = 1;
 
     // PRE-GAME
+        // Intro screen
     drawLogo();
+    drawBanner();
     getch();
     erraseLogo();
+    erraseBanner();
+        // Game instructions
+    instructions();
+    getch();
+    erraseInstructions();
+        // Player instructions
+    drawPlayerInstructions();
+    getch();
 
     p1.name = "Bruce";
     p2.name = "Angelis";

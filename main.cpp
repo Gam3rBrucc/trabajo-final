@@ -25,6 +25,8 @@ string message1;
 string message2;
 string playerTurnMsg;
 
+char available_colors[5] = {'A','B','V','M','R'};
+
 int UPC_logo[26][21] = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
@@ -283,8 +285,98 @@ void drawPlayerInstructions() {
     cout << "Para mover una ficha seleccionalo usando la tecla [x], luego dirijete a la casilla donde quieras";
     Console::SetCursorPosition(45, 9);
     cout << "mover la ficha u presiona [x] de nuevo.";
+    Console::ForegroundColor = ConsoleColor::DarkGray;
     Console::SetCursorPosition(69, 12);
     cout << "Precione cualquier tecla para continuar...";
+}
+
+void displayAvailableColors(int x, int y) {
+    Console::SetCursorPosition(y, x);
+    for (int i = 0; i < 5; i++) {
+        switch (available_colors[i]) {
+        case 'R':
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << "  [R] = ";
+            Console::ForegroundColor = ConsoleColor::Red;
+            cout << "Rojo";
+            break;
+        case 'M':
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << "  [M] = ";
+            Console::ForegroundColor = ConsoleColor::Magenta;
+            cout << "Mangenta";
+            break;
+        case 'B':
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << "  [B] = ";
+            Console::ForegroundColor = ConsoleColor::Blue;
+            cout << "Azul";
+            break;
+        case 'V':
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << "  [V] = ";
+            Console::ForegroundColor = ConsoleColor::Green;
+            cout << "Verde";
+            break;
+        case 'A':
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << "  [A] = ";
+            Console::ForegroundColor = ConsoleColor::Yellow;
+            cout << "Amarillo";
+            break;
+        }
+    }
+    Console::ForegroundColor = ConsoleColor::White;
+}
+
+void player1Input() {
+    Console::ForegroundColor = ConsoleColor::Black;
+    Console::SetCursorPosition(69, 12);
+    cout << "                                                        ";
+    Console::CursorVisible = true;
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::SetCursorPosition(45, 12);
+    cout << "Jugador 1, por favor ingrese su nombre : ";
+    cin >> p1.name;
+    Console::SetCursorPosition(45, 14);
+    cout << "Hola " << p1.name << "! Ahora porfavor elige un color: ";
+    displayAvailableColors(16, 45);
+    Console::SetCursorPosition(45, 17);
+    cout << "Color: ";
+    char color;
+    cin >> color;
+    p1.color = toupper(color);
+    for (int i = 0; i < 5; i++) {
+        if (p1.color == available_colors[i]) {
+            available_colors[i] = '-';
+        }
+    }
+}
+
+void player2Input() {
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::SetCursorPosition(45, 20);
+    cout << "Jugador 2, por favor ingrese su nombre :";
+    cin >> p2.name;
+    Console::SetCursorPosition(45, 22);
+    cout << "Hola " << p2.name << "! Ahora porfavor elige un color: ";
+    displayAvailableColors(24, 45);
+    Console::SetCursorPosition(45, 25);
+    cout << "Color: ";
+    char color;
+    cin >> color;
+    p2.color = toupper(color);
+    Console::ForegroundColor = ConsoleColor::DarkGray;
+    Console::SetCursorPosition(69, 30);
+    cout << "Precione cualquier tecla para continuar...";
+}
+
+void errasePlayerInput() {
+    Console::ForegroundColor = ConsoleColor::Black;
+    for (int i = 0; i < 35; i++) {
+        Console::SetCursorPosition(45, i);
+        cout << "                                                                                                                                   ";
+    }
 }
 
 void interperate(int num) {
@@ -359,11 +451,20 @@ void placeP1Piece(int x, int y) {
     int xStartPos = UNIT * (x - 1) + 2;
     int yStartPos = 2 * UNIT * (y - 1) + 2;
     switch (p1.color) {
-    case 'Y':
+    case 'A':
         Console::ForegroundColor = ConsoleColor::Yellow;
         break;
     case 'R':
         Console::ForegroundColor = ConsoleColor::Red;
+        break;
+    case 'V':
+        Console::ForegroundColor = ConsoleColor::Green;
+        break;
+    case 'B':
+        Console::ForegroundColor = ConsoleColor::Blue;
+        break;
+    case 'M':
+        Console::ForegroundColor = ConsoleColor::Magenta;
         break;
     }
     for (int j = 0; j < 5; j++) {
@@ -385,8 +486,17 @@ void placeP2Piece(int x, int y) {
     int xStartPos = UNIT * (x - 1) + 2;
     int yStartPos = 2 * UNIT * (y - 1) + 2;
     switch (p2.color) {
-    case 'W':
-        Console::ForegroundColor = ConsoleColor::White;
+    case 'A':
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        break;
+    case 'R':
+        Console::ForegroundColor = ConsoleColor::Red;
+        break;
+    case 'V':
+        Console::ForegroundColor = ConsoleColor::Green;
+        break;
+    case 'B':
+        Console::ForegroundColor = ConsoleColor::Blue;
         break;
     case 'M':
         Console::ForegroundColor = ConsoleColor::Magenta;
@@ -623,14 +733,14 @@ int main() {
         // Player instructions
     drawPlayerInstructions();
     getch();
+        // Player name input
+    player1Input();
+    player2Input();
+    Console::CursorVisible = false;
+    getch();
+    errasePlayerInput();
 
-    p1.name = "Bruce";
-    p2.name = "Angelis";
-    p1.color = 'R';
-    p2.color = 'M';
-    // GAME
     printGrid();
-
     while (true) {
         
         // Game updates

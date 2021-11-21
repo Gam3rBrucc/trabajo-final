@@ -12,7 +12,7 @@ bool playerMoved;
 
 struct player {
     string name;
-    char color;
+    int color;
     int captured_pieces;
     int moves = 0;
 };
@@ -143,20 +143,6 @@ void drawLogo() {
     }
 }
 
-void erraseLogo() {
-    int k;
-    for (int j = 0; j < 26; j++) {
-        k = 0;
-        for (int i = 31; i < 21+31; i++) {
-            if (UPC_logo[j][k] == 1) {
-                Console::SetCursorPosition((i * 2), j);
-                cout << "  ";
-            }
-            k++;
-        }
-    }
-}
-
 void drawBanner() {
     int k, l;
     k = 0;
@@ -178,26 +164,6 @@ void drawBanner() {
     Console::ForegroundColor = ConsoleColor::DarkGray;
     Console::SetCursorPosition(60, 44);
     cout << "Precione cualquier tecla para continuar...";
-}
-
-void erraseBanner() {
-    int k, l;
-    k = 0;
-    for (int j = 27; j < 9+27; j++) {
-        l = 0;
-        for (int i = 29; i < 24+29; i++) {
-            if (seega_banner[k][l] == 0) {
-                Console::SetCursorPosition((i * 2), j);
-                cout << "  ";
-            }
-            l++;
-        }
-        k++;
-    }
-    Console::SetCursorPosition(55, 41);
-    cout << "                                                            ";
-    Console::SetCursorPosition(60, 44);
-    cout << "                                                  ";
 }
 
 void instructions() {
@@ -257,14 +223,6 @@ void instructions() {
     Console::ForegroundColor = ConsoleColor::DarkGray;
     Console::SetCursorPosition(69, 37);
     cout << "Precione cualquier tecla para continuar...";
-}
-
-void erraseInstructions() {
-    for (int i = 2; i < 38; i++) {
-        Console::ForegroundColor = ConsoleColor::Black;
-        Console::SetCursorPosition(40, i);
-        cout << "                                                                                                                      ";
-    }
 }
 
 void drawPlayerInstructions() {
@@ -344,10 +302,34 @@ void player1Input() {
     Console::SetCursorPosition(45, 17);
     cout << "Color: ";
     char color;
-    cin >> color;
-    p1.color = toupper(color);
+    do {
+        Console::SetCursorPosition(52, 17);
+        cin >> color;
+        color = toupper(color);
+        if (color != 'R' && color != 'M' && color != 'B' && color != 'A' && color != 'V') {
+            Console::SetCursorPosition(52, 17);
+            cout << "                   ";
+        }
+    } while (color != 'R' && color != 'M' && color != 'B' && color != 'A' && color != 'V');
+    switch (color) {
+    case 'R':
+        p1.color = 4;
+        break;
+    case 'M':
+        p1.color = 13;
+        break;
+    case 'B':
+        p1.color = 1;
+        break;
+    case 'A':
+        p1.color = 6;
+        break;
+    case 'V':
+        p1.color = 2;
+        break;
+    }
     for (int i = 0; i < 5; i++) {
-        if (p1.color == available_colors[i]) {
+        if (color == available_colors[i]) {
             available_colors[i] = '-';
         }
     }
@@ -356,7 +338,7 @@ void player1Input() {
 void player2Input() {
     Console::ForegroundColor = ConsoleColor::White;
     Console::SetCursorPosition(45, 20);
-    cout << "Jugador 2, por favor ingrese su nombre :";
+    cout << "Jugador 2, por favor ingrese su nombre : ";
     cin >> p2.name;
     Console::SetCursorPosition(45, 22);
     cout << "Hola " << p2.name << "! Ahora porfavor elige un color: ";
@@ -364,19 +346,37 @@ void player2Input() {
     Console::SetCursorPosition(45, 25);
     cout << "Color: ";
     char color;
-    cin >> color;
-    p2.color = toupper(color);
+    bool pass = false;
+    do {
+        Console::SetCursorPosition(52, 25);
+        cout << "                               ";
+        Console::SetCursorPosition(52, 25);
+        cin >> color;
+        color = toupper(color);
+        for (int i = 0; i < 5; i++) {
+            if (color == available_colors[i]) pass = true;
+        }
+    } while (!pass);
+    switch (color) {
+    case 'R':
+        p2.color = 4;
+        break;
+    case 'M':
+        p2.color = 13;
+        break;
+    case 'B':
+        p2.color = 1;
+        break;
+    case 'A':
+        p2.color = 6;
+        break;
+    case 'V':
+        p2.color = 2;
+        break;
+    }
     Console::ForegroundColor = ConsoleColor::DarkGray;
     Console::SetCursorPosition(69, 30);
     cout << "Precione cualquier tecla para continuar...";
-}
-
-void errasePlayerInput() {
-    Console::ForegroundColor = ConsoleColor::Black;
-    for (int i = 0; i < 35; i++) {
-        Console::SetCursorPosition(45, i);
-        cout << "                                                                                                                                   ";
-    }
 }
 
 void interperate(int num) {
@@ -388,12 +388,6 @@ void interperate(int num) {
     case 1:
         Console::ForegroundColor = ConsoleColor::Black; // Dark square filling
         cout << char(219) << char(219);
-        break;
-    case 2:
-        //Player 1 chosen color
-        break;
-    case 3:
-        //Player 2 chosen color
         break;
     case 9:
         Console::ForegroundColor = ConsoleColor::DarkGray; // Inbetween square filling
@@ -413,7 +407,7 @@ void printGrid() {
     }
 }
 
-void drawSelector(int x, int y) { // x = rows, y = columns
+void drawSelector(int x, int y)  { // x = rows, y = columns
     Console::ForegroundColor = ConsoleColor::Yellow;
     int xStartPos = UNIT * (x - 1);
     int yStartPos = UNIT * (y - 1) * 2;
@@ -450,23 +444,7 @@ void erraseSelector(int x, int y) { // x = rows, y = columns
 void placeP1Piece(int x, int y) {
     int xStartPos = UNIT * (x - 1) + 2;
     int yStartPos = 2 * UNIT * (y - 1) + 2;
-    switch (p1.color) {
-    case 'A':
-        Console::ForegroundColor = ConsoleColor::Yellow;
-        break;
-    case 'R':
-        Console::ForegroundColor = ConsoleColor::Red;
-        break;
-    case 'V':
-        Console::ForegroundColor = ConsoleColor::Green;
-        break;
-    case 'B':
-        Console::ForegroundColor = ConsoleColor::Blue;
-        break;
-    case 'M':
-        Console::ForegroundColor = ConsoleColor::Magenta;
-        break;
-    }
+    Console::ForegroundColor = ConsoleColor(p1.color);
     for (int j = 0; j < 5; j++) {
         for (int i = 1; i <= 5; i++) {
             if ((i == 1 || i == 5) && j == 0) {
@@ -485,23 +463,7 @@ void placeP1Piece(int x, int y) {
 void placeP2Piece(int x, int y) {
     int xStartPos = UNIT * (x - 1) + 2;
     int yStartPos = 2 * UNIT * (y - 1) + 2;
-    switch (p2.color) {
-    case 'A':
-        Console::ForegroundColor = ConsoleColor::Yellow;
-        break;
-    case 'R':
-        Console::ForegroundColor = ConsoleColor::Red;
-        break;
-    case 'V':
-        Console::ForegroundColor = ConsoleColor::Green;
-        break;
-    case 'B':
-        Console::ForegroundColor = ConsoleColor::Blue;
-        break;
-    case 'M':
-        Console::ForegroundColor = ConsoleColor::Magenta;
-        break;
-    }
+    Console::ForegroundColor = ConsoleColor(p2.color);
     for (int j = 0; j < 5; j++) {
         for (int i = 1; i <= 5; i++) {
             if ((i == 1 || i == 5) && j == 0) {
@@ -560,12 +522,15 @@ void drawStatsBoard(int p) {
     cout << "It is ";
     switch (p) {
     case 1:
+        Console::ForegroundColor = ConsoleColor(p1.color);
         cout << p1.name;
         break;
     case 2:
+        Console::ForegroundColor = ConsoleColor(p2.color);
         cout << p2.name;
         break;
     }
+    Console::ForegroundColor = ConsoleColor::White;
     cout << "'s turn.";
     for (int i = 0; i < 5; i++) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 5);
@@ -616,7 +581,11 @@ void move(int* x, int* y, int p) {
             if (*y - 1 != 4) *y = *y + 1;
             break;
         case 'Z': // Place piece
-            if (gridStats[*x - 1][*y - 1] == 0) {
+            if (*x == 3 && *y == 3) {
+                message1 = "No puedes colocar una ficha en el cuadro del medio!";
+                message2 = "";
+            }
+            else if (gridStats[*x - 1][*y - 1] == 0) {
                 switch (p) {
                 case 1:
                     placeP1Piece(*x, *y);
@@ -633,7 +602,7 @@ void move(int* x, int* y, int p) {
                 message2 = "";
             }
             else {
-                message1 = "You can't place a piece on top of another.";
+                message1 = "No puedes colocar una ficha encima de otra!";
                 message2 = "";
             }
             break;
@@ -664,16 +633,29 @@ void move(int* x, int* y, int p) {
                     }
                 }
                 else if (gridStats[*x - 1][*y - 1] == 0) {
-                    message1 = "You can't select an empty square.";
+                    message1 = "No se puede seleccionar un cuadro vacio...";
                     message2 = "";
                 }
                 else {
-                    message1 = "You can't select your opponents piece.";
+                    message1 = "No puedes seleccionar la ficha de tu oponente!";
                     message2 = "";
                 }
             }
             else { // Moves a piece
-                if (gridStats[*x - 1][*y - 1] != 1 && gridStats[*x - 1][*y - 1] != 2) {
+                if (xHighlight == *x && yHighlight == *y) {
+                    unHighlight(xHighlight, yHighlight);
+                    xHighlight = 0;
+                    yHighlight = 0;
+                    switch (p) {
+                    case 1:
+                        placeP1Piece(*x, *y);
+                        break;
+                    case 2:
+                        placeP2Piece(*x, *y);
+                        break;
+                    }
+                }
+                else if (gridStats[*x - 1][*y - 1] == 0) {
                     if ((abs(*x - xHighlight) == 1 && abs(*y - yHighlight) == 0) || (abs(*x - xHighlight) == 0 && abs(*y - yHighlight) == 1)) {
                         message1 = "";
                         message2 = "";
@@ -692,18 +674,42 @@ void move(int* x, int* y, int p) {
                         xHighlight = 0;
                         yHighlight = 0;
                     }
-                    else if (xHighlight == 0 && yHighlight == 0) {
-                        message1 = "You have to select a piece first in order";
-                        message2 = "to move it.";
-                    }
                     else {
-                        message1 = "You can only move to a square dirrectly above,";
-                        message2 = "bellow or to the sides of your selected piece.";
+                        message1 = "Solo puedes colocar una ficha en un cuadro que este directamente";
+                        message2 = "arriba, abajo o a los costados de tu ficha seleccionada.";
                     }
                 }
                 else {
-                    message1 = "You can't place move a piece on top of another.";
-                    message2 = "";
+                    if (gridStats[*x - 1][*y - 1] == p) {
+                        if (gridStats[*x - 1][*y - 1] == p) {
+                            if (xHighlight != 0 || yHighlight != 0) {
+                                unHighlight(xHighlight, yHighlight);
+                                switch (p) {
+                                case 1:
+                                    placeP1Piece(xHighlight, yHighlight);
+                                    break;
+                                case 2:
+                                    placeP2Piece(xHighlight, yHighlight);
+                                    break;
+                                }
+                            }
+                            xHighlight = *x;
+                            yHighlight = *y;
+                            highlight(*x, *y);
+                            switch (p) {
+                            case 1:
+                                placeP1Piece(*x, *y);
+                                break;
+                            case 2:
+                                placeP2Piece(*x, *y);
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        message1 = "No puedes colocar una ficha encima de otra!";
+                        message2 = "";
+                    }
                 }
                 break;
             }
@@ -724,12 +730,11 @@ int main() {
     drawLogo();
     drawBanner();
     getch();
-    erraseLogo();
-    erraseBanner();
+    Console::Clear();
         // Game instructions
     instructions();
     getch();
-    erraseInstructions();
+    Console::Clear();
         // Player instructions
     drawPlayerInstructions();
     getch();
@@ -738,11 +743,20 @@ int main() {
     player2Input();
     Console::CursorVisible = false;
     getch();
-    errasePlayerInput();
+    Console::Clear();
 
+    // GAME
     printGrid();
+    placeP1Piece(1, 3);
+    gridStats[0][2] = 1;
+    placeP1Piece(5, 3);
+    gridStats[4][2] = 1;
+    placeP2Piece(3, 1);
+    gridStats[2][0] = 2;
+    placeP2Piece(3, 5);
+    gridStats[2][4] = 2;
     while (true) {
-        
+
         // Game updates
         playerMoved = false;
 

@@ -4,30 +4,30 @@
 using namespace std;
 using namespace System;
 
-const int UNIT = 8; // Size of a square
-const int TWaH = (5 * UNIT) + 1; // Board Width and Height
-int Xant = 3, Yant = 3; // X anterior, Y anterior
-int xHighlight = 0, yHighlight = 0;
+const short UNIT = 8; // Size of a square
+const short TWaH = (5 * UNIT) + 1; // Board Width and Height
+short Xant = 3, Yant = 3; // X anterior, Y anterior
+short xHighlight = 0, yHighlight = 0;
 bool playerMoved;
 
 struct player {
     string name;
-    int color;
-    int captured_pieces;
-    int moves = 0;
+    short color;
+    short captured_pieces;
+    short moves = 0;
 };
 
 player p1;
 player p2;
 
-int moves = 0;
+short moves = 0;
 string message1;
 string message2;
 string playerTurnMsg;
 
 char available_colors[5] = {'A','B','V','M','R'};
 
-int UPC_logo[26][21] = {
+short UPC_logo[26][21] = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0},
@@ -56,7 +56,7 @@ int UPC_logo[26][21] = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
-int seega_banner[9][24] = {
+short seega_banner[9][24] = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,0},
     {0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1,0},
@@ -68,7 +68,7 @@ int seega_banner[9][24] = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
-int grid[TWaH][TWaH] = {
+short grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
     {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
@@ -112,7 +112,7 @@ int grid[TWaH][TWaH] = {
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9}
 };
 
-int gridStats[5][5] = {
+short gridStats[5][5] = {
     {0,0,0,0,0},
     {0,0,0,0,0},
     {0,0,0,0,0},
@@ -120,7 +120,7 @@ int gridStats[5][5] = {
     {0,0,0,0,0}
 };
 
-int gridBackground[5][5] = {
+short gridBackground[5][5] = {
     {1,0,1,0,1},
     {0,1,0,1,0},
     {1,0,1,0,1},
@@ -129,10 +129,10 @@ int gridBackground[5][5] = {
 };
 
 void drawLogo() {
-    int k;
-    for (int j = 0; j < 26; j++) {
+    short k;
+    for (short j = 0; j < 26; j++) {
         k = 0;
-        for (int i = 31; i < 21+31; i++) {
+        for (short i = 31; i < 21+31; i++) {
             if(UPC_logo[j][k] == 1) {
                 Console::ForegroundColor = ConsoleColor::Red;
                 Console::SetCursorPosition((i * 2), j);
@@ -144,11 +144,11 @@ void drawLogo() {
 }
 
 void drawBanner() {
-    int k, l;
+    short k, l;
     k = 0;
-    for (int j = 27; j < 9+27; j++) {
+    for (short j = 27; j < 9+27; j++) {
         l = 0;
-        for (int i = 29; i < 24+29; i++) {
+        for (short i = 29; i < 24+29; i++) {
             if (seega_banner[k][l] == 0) {
                 Console::ForegroundColor = ConsoleColor::White;
                 Console::SetCursorPosition((i * 2), j);
@@ -248,9 +248,9 @@ void drawPlayerInstructions() {
     cout << "Precione cualquier tecla para continuar...";
 }
 
-void displayAvailableColors(int x, int y) {
+void displayAvailableColors(short x, short y) {
     Console::SetCursorPosition(y, x);
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         switch (available_colors[i]) {
         case 'R':
             Console::ForegroundColor = ConsoleColor::White;
@@ -328,7 +328,7 @@ void player1Input() {
         p1.color = 2;
         break;
     }
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         if (color == available_colors[i]) {
             available_colors[i] = '-';
         }
@@ -353,7 +353,7 @@ void player2Input() {
         Console::SetCursorPosition(52, 25);
         cin >> color;
         color = toupper(color);
-        for (int i = 0; i < 5; i++) {
+        for (short i = 0; i < 5; i++) {
             if (color == available_colors[i]) pass = true;
         }
     } while (!pass);
@@ -379,7 +379,7 @@ void player2Input() {
     cout << "Precione cualquier tecla para continuar...";
 }
 
-void interperate(int num) {
+void interperate(short num) {
     switch (num) {
     case 0:
         Console::ForegroundColor = ConsoleColor::Cyan; // Light square filling
@@ -398,8 +398,8 @@ void interperate(int num) {
 }
 
 void printGrid() {
-    for (int j = 0; j < TWaH; j++) {
-        for (int i = 0; i < TWaH; i++) {
+    for (short j = 0; j < TWaH; j++) {
+        for (short i = 0; i < TWaH; i++) {
             Console::SetCursorPosition((i * 2), j);
             interperate(grid[j][i]);
         }
@@ -407,11 +407,11 @@ void printGrid() {
     }
 }
 
-void drawSelector(int x, int y)  { // x = rows, y = columns
+void drawSelector(short x, short y)  { // x = rows, y = columns
     Console::ForegroundColor = ConsoleColor::Yellow;
-    int xStartPos = UNIT * (x - 1);
-    int yStartPos = UNIT * (y - 1) * 2;
-    for (int i = 0; i < (UNIT + 1); i++) {
+    short xStartPos = UNIT * (x - 1);
+    short yStartPos = UNIT * (y - 1) * 2;
+    for (short i = 0; i < (UNIT + 1); i++) {
         // SetCursosPosition parameters are (COLUMNS, ROWS)
         Console::SetCursorPosition(yStartPos + (i * 2), xStartPos); // Top side
         cout << char(219) << char(219);
@@ -424,11 +424,11 @@ void drawSelector(int x, int y)  { // x = rows, y = columns
     }
 }
 
-void erraseSelector(int x, int y) { // x = rows, y = columns
+void erraseSelector(short x, short y) { // x = rows, y = columns
     Console::ForegroundColor = ConsoleColor::DarkGray;
-    int xStartPos = UNIT * (x - 1);
-    int yStartPos = UNIT * (y - 1) * 2;
-    for (int i = 0; i < (UNIT + 1); i++) {
+    short xStartPos = UNIT * (x - 1);
+    short yStartPos = UNIT * (y - 1) * 2;
+    for (short i = 0; i < (UNIT + 1); i++) {
         // SetCursosPosition parameters are (COLUMNS, ROWS)
         Console::SetCursorPosition(yStartPos + (i * 2), xStartPos); // Top side
         cout << char(219) << char(219);
@@ -441,12 +441,12 @@ void erraseSelector(int x, int y) { // x = rows, y = columns
     }
 }
 
-void placeP1Piece(int x, int y) {
-    int xStartPos = UNIT * (x - 1) + 2;
-    int yStartPos = 2 * UNIT * (y - 1) + 2;
+void placeP1Piece(short x, short y) {
+    short xStartPos = UNIT * (x - 1) + 2;
+    short yStartPos = 2 * UNIT * (y - 1) + 2;
     Console::ForegroundColor = ConsoleColor(p1.color);
-    for (int j = 0; j < 5; j++) {
-        for (int i = 1; i <= 5; i++) {
+    for (short j = 0; j < 5; j++) {
+        for (short i = 1; i <= 5; i++) {
             if ((i == 1 || i == 5) && j == 0) {
             }
             else if ((i == 1 || i == 5) && j == 4) {
@@ -460,12 +460,12 @@ void placeP1Piece(int x, int y) {
     }
 }
 
-void placeP2Piece(int x, int y) {
-    int xStartPos = UNIT * (x - 1) + 2;
-    int yStartPos = 2 * UNIT * (y - 1) + 2;
+void placeP2Piece(short x, short y) {
+    short xStartPos = UNIT * (x - 1) + 2;
+    short yStartPos = 2 * UNIT * (y - 1) + 2;
     Console::ForegroundColor = ConsoleColor(p2.color);
-    for (int j = 0; j < 5; j++) {
-        for (int i = 1; i <= 5; i++) {
+    for (short j = 0; j < 5; j++) {
+        for (short i = 1; i <= 5; i++) {
             if ((i == 1 || i == 5) && j == 0) {
             }
             else if ((i == 1 || i == 5) && j == 4) {
@@ -479,21 +479,21 @@ void placeP2Piece(int x, int y) {
     }
 }
 
-void highlight(int x, int y) {
-    int xStartPos = UNIT * (x - 1) + 1;
-    int yStartPos = 2 * UNIT * (y - 1) + 2;
+void highlight(short x, short y) {
+    short xStartPos = UNIT * (x - 1) + 1;
+    short yStartPos = 2 * UNIT * (y - 1) + 2;
     Console::ForegroundColor = ConsoleColor::Blue;
-    for (int j = 0; j < 7; j++) {
-        for (int i = 0; i < 7; i++) {
+    for (short j = 0; j < 7; j++) {
+        for (short i = 0; i < 7; i++) {
             Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
             cout << char(219) << char(219);
         }
     }
 }
 
-void unHighlight(int x, int y) {
-    int xStartPos = UNIT * (x - 1) + 1;
-    int yStartPos = 2 * UNIT * (y - 1) + 2;
+void unHighlight(short x, short y) {
+    short xStartPos = UNIT * (x - 1) + 1;
+    short yStartPos = 2 * UNIT * (y - 1) + 2;
     switch (gridBackground[x - 1][y - 1]) {
     case 0:
         Console::ForegroundColor = ConsoleColor::Cyan;
@@ -502,15 +502,15 @@ void unHighlight(int x, int y) {
         Console::ForegroundColor = ConsoleColor::Black;
         break;
     }
-    for (int j = 0; j < 7; j++) {
-        for (int i = 0; i < 7; i++) {
+    for (short j = 0; j < 7; j++) {
+        for (short i = 0; i < 7; i++) {
             Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
             cout << char(219) << char(219);
         }
     }
 }
 
-void drawStatsBoard(int p) {
+void drawStatsBoard(short p) {
     Console::ForegroundColor = ConsoleColor::White;
     Console::SetCursorPosition((TWaH * 2)+ 5, 0);
     cout << p1.name << " moves: " << p1.moves;
@@ -532,23 +532,23 @@ void drawStatsBoard(int p) {
     }
     Console::ForegroundColor = ConsoleColor::White;
     cout << "'s turn.";
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 5);
         cout << "[" << gridStats[0][i] << "] ";
     }
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 6);
         cout << "[" << gridStats[1][i] << "] ";
     }
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 7);
         cout << "[" << gridStats[2][i] << "] ";
     }
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 8);
         cout << "[" << gridStats[3][i] << "] ";
     }
-    for (int i = 0; i < 5; i++) {
+    for (short i = 0; i < 5; i++) {
         Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 9);
         cout << "[" << gridStats[4][i] << "] ";
     }
@@ -562,7 +562,7 @@ void drawStatsBoard(int p) {
     cout << message2;
 }
 
-void move(int* x, int* y, int p) {
+void move(short* x, short* y, short p) {
     char key;
     Xant = *x, Yant = *y;
     if (_kbhit) {
@@ -722,8 +722,8 @@ int main() {
     Console::CursorVisible = false;
     Console::SetWindowSize(175, 50);
 
-    int x = 3, y = 3;
-    int playerTurn = 1;
+    short x = 3, y = 3;
+    short playerTurn = 1;
 
     // PRE-GAME
         // Intro screen

@@ -8,13 +8,16 @@ const short UNIT = 8; // Size of a square
 const short TWaH = (5 * UNIT) + 1; // Board Width and Height
 short Xant = 3, Yant = 3; // X anterior, Y anterior
 short xHighlight = 0, yHighlight = 0;
+short piecesPlaced = 0;
 bool playerMoved;
+bool secondFase = false;
 
 struct player {
     string name;
     short color;
     short captured_pieces;
     short moves = 0;
+    short piecesPlaced = 0;
 };
 
 player p1;
@@ -512,14 +515,10 @@ void unHighlight(short x, short y) {
 
 void drawStatsBoard(short p) {
     Console::ForegroundColor = ConsoleColor::White;
-    Console::SetCursorPosition((TWaH * 2)+ 5, 0);
-    cout << p1.name << " moves: " << p1.moves;
-    Console::SetCursorPosition((TWaH * 2) + 5, 1);
-    cout << p2.name << " moves: " << p2.moves;
     Console::SetCursorPosition((TWaH * 2) + 5, 3);
     cout << "                                  ";
     Console::SetCursorPosition((TWaH * 2) + 5, 3);
-    cout << "It is ";
+    cout << "Le toca a ";
     switch (p) {
     case 1:
         Console::ForegroundColor = ConsoleColor(p1.color);
@@ -531,40 +530,31 @@ void drawStatsBoard(short p) {
         break;
     }
     Console::ForegroundColor = ConsoleColor::White;
-    cout << "'s turn.";
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 5);
-        cout << "[" << gridStats[0][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 6);
-        cout << "[" << gridStats[1][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 7);
-        cout << "[" << gridStats[2][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 8);
-        cout << "[" << gridStats[3][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 9);
-        cout << "[" << gridStats[4][i] << "] ";
-    }
+    Console::SetCursorPosition((TWaH * 2) + 5, 5);
+    cout << p1.name << " movimientos: " << p1.moves;
+    Console::SetCursorPosition((TWaH * 2) + 5, 6);
+    cout << p2.name << " movimientos: " << p2.moves;
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::SetCursorPosition((TWaH * 2) + 5, 7);
+    cout << "Movimientos total: " << moves;
     Console::SetCursorPosition((TWaH * 2) + 5, 11);
     cout << "                                                                   ";
     Console::SetCursorPosition((TWaH * 2) + 5, 12);
     cout << "                                                                   ";
+    Console::ForegroundColor = ConsoleColor::Black;
+    Console::BackgroundColor = ConsoleColor::White;
     Console::SetCursorPosition((TWaH * 2) + 5, 11);
     cout << message1;
     Console::SetCursorPosition((TWaH * 2) + 5, 12);
     cout << message2;
+    Console::ForegroundColor = ConsoleColor::White;
+    Console::BackgroundColor = ConsoleColor::Black;
 }
 
 void move(short* x, short* y, short p) {
     char key;
     Xant = *x, Yant = *y;
+    // Changes x and y coordinates depending on player input
     if (_kbhit) {
         key = toupper(getch());
         switch (key) {
@@ -581,86 +571,51 @@ void move(short* x, short* y, short p) {
             if (*y - 1 != 4) *y = *y + 1;
             break;
         case 'Z': // Place piece
-            if (*x == 3 && *y == 3) {
-                message1 = "No puedes colocar una ficha en el cuadro del medio!";
-                message2 = "";
-            }
-            else if (gridStats[*x - 1][*y - 1] == 0) {
-                switch (p) {
-                case 1:
-                    placeP1Piece(*x, *y);
-                    p1.moves++;
-                    break;
-                case 2:
-                    placeP2Piece(*x, *y);
-                    p2.moves++;
-                    break;
-                }
-                gridStats[*x - 1][*y - 1] = p;
-                playerMoved = true;
-                message1 = "";
+            if (secondFase) {
+                message1 = "Ya no puedes colocar fichas!";
                 message2 = "";
             }
             else {
-                message1 = "No puedes colocar una ficha encima de otra!";
-                message2 = "";
-            }
-            break;
-        case 'X': // Select piece
-            if (xHighlight == 0 && yHighlight == 0) {
-                if (gridStats[*x - 1][*y - 1] == p) {
-                    if (xHighlight != 0 || yHighlight != 0) {
-                        unHighlight(xHighlight, yHighlight);
-                        switch (p) {
-                        case 1:
-                            placeP1Piece(xHighlight, yHighlight);
-                            break;
-                        case 2:
-                            placeP2Piece(xHighlight, yHighlight);
-                            break;
-                        }
-                    }
-                    xHighlight = *x;
-                    yHighlight = *y;
-                    highlight(*x, *y);
+                if (*x == 3 && *y == 3) {
+                    message1 = "No puedes colocar una ficha en el cuadro del medio!";
+                    message2 = "";
+                }
+                else if (gridStats[*x - 1][*y - 1] == 0) { // Checks if square is empty
                     switch (p) {
                     case 1:
                         placeP1Piece(*x, *y);
+                        ++p1.moves;
+                        ++p1.piecesPlaced;
                         break;
                     case 2:
                         placeP2Piece(*x, *y);
+                        ++p2.moves;
+                        ++p2.piecesPlaced;
                         break;
                     }
-                }
-                else if (gridStats[*x - 1][*y - 1] == 0) {
-                    message1 = "No se puede seleccionar un cuadro vacio...";
+                    gridStats[*x - 1][*y - 1] = p;
+                    ++piecesPlaced;
+                    if (piecesPlaced == 2) { // Allows each player to place two pieces at a time
+                        playerMoved = true;
+                        piecesPlaced = 0;
+                    }
+                    message1 = "";
                     message2 = "";
                 }
                 else {
-                    message1 = "No puedes seleccionar la ficha de tu oponente!";
+                    message1 = "No puedes colocar una ficha encima de otra!";
                     message2 = "";
                 }
             }
-            else { // Moves a piece
-                if (xHighlight == *x && yHighlight == *y) {
-                    unHighlight(xHighlight, yHighlight);
-                    xHighlight = 0;
-                    yHighlight = 0;
-                    switch (p) {
-                    case 1:
-                        placeP1Piece(*x, *y);
-                        break;
-                    case 2:
-                        placeP2Piece(*x, *y);
-                        break;
-                    }
-                }
-                else if (gridStats[*x - 1][*y - 1] == 0) {
-                    if ((abs(*x - xHighlight) == 1 && abs(*y - yHighlight) == 0) || (abs(*x - xHighlight) == 0 && abs(*y - yHighlight) == 1)) {
-                        message1 = "";
-                        message2 = "";
-                        gridStats[*x - 1][*y - 1] = p;
-                        gridStats[xHighlight - 1][yHighlight - 1] = 0;
+            break;
+        case 'X': // Select piece
+            if (secondFase) {
+                if (xHighlight == 0 && yHighlight == 0) { // Checks if there are any sqaures highlighted
+                    if (gridStats[*x - 1][*y - 1] == p) {
+                        // Checks if the square the player wants to highlight has that players piece in it
+                        xHighlight = *x;
+                        yHighlight = *y;
+                        highlight(*x, *y);
                         switch (p) {
                         case 1:
                             placeP1Piece(*x, *y);
@@ -669,33 +624,38 @@ void move(short* x, short* y, short p) {
                             placeP2Piece(*x, *y);
                             break;
                         }
-                        unHighlight(xHighlight, yHighlight);
-                        playerMoved = true;
-                        xHighlight = 0;
-                        yHighlight = 0;
+                    }
+                    else if (gridStats[*x - 1][*y - 1] == 0) {
+                        message1 = "No se puede seleccionar un cuadro vacio...";
+                        message2 = "";
                     }
                     else {
-                        message1 = "Solo puedes colocar una ficha en un cuadro que este directamente";
-                        message2 = "arriba, abajo o a los costados de tu ficha seleccionada.";
+                        message1 = "No puedes seleccionar la ficha de tu oponente!";
+                        message2 = "";
                     }
                 }
                 else {
-                    if (gridStats[*x - 1][*y - 1] == p) {
-                        if (gridStats[*x - 1][*y - 1] == p) {
-                            if (xHighlight != 0 || yHighlight != 0) {
-                                unHighlight(xHighlight, yHighlight);
-                                switch (p) {
-                                case 1:
-                                    placeP1Piece(xHighlight, yHighlight);
-                                    break;
-                                case 2:
-                                    placeP2Piece(xHighlight, yHighlight);
-                                    break;
-                                }
-                            }
-                            xHighlight = *x;
-                            yHighlight = *y;
-                            highlight(*x, *y);
+                    if (xHighlight == *x && yHighlight == *y) { // Unselects a piece
+                        unHighlight(xHighlight, yHighlight);
+                        xHighlight = 0;
+                        yHighlight = 0;
+                        switch (p) {
+                        case 1:
+                            placeP1Piece(*x, *y);
+                            break;
+                        case 2:
+                            placeP2Piece(*x, *y);
+                            break;
+                        }
+                        message1 = "";
+                        message2 = "";
+                    }
+                    else if (gridStats[*x - 1][*y - 1] == 0) { // Moves a piece
+                        if ((abs(*x - xHighlight) == 1 && abs(*y - yHighlight) == 0) || (abs(*x - xHighlight) == 0 && abs(*y - yHighlight) == 1)) {
+                            message1 = "";
+                            message2 = "";
+                            gridStats[*x - 1][*y - 1] = p;
+                            gridStats[xHighlight - 1][yHighlight - 1] = 0;
                             switch (p) {
                             case 1:
                                 placeP1Piece(*x, *y);
@@ -704,14 +664,55 @@ void move(short* x, short* y, short p) {
                                 placeP2Piece(*x, *y);
                                 break;
                             }
+                            unHighlight(xHighlight, yHighlight);
+                            playerMoved = true;
+                            xHighlight = 0;
+                            yHighlight = 0;
+                        }
+                        else {
+                            message1 = "Solo puedes colocar una ficha en un cuadro que este directamente";
+                            message2 = "arriba, abajo o a los costados de tu ficha seleccionada.";
                         }
                     }
-                    else {
-                        message1 = "No puedes colocar una ficha encima de otra!";
-                        message2 = "";
+                    else { // Selects another piece
+                        if (gridStats[*x - 1][*y - 1] == p) {
+                            if (gridStats[*x - 1][*y - 1] == p) {
+                                if (xHighlight != 0 || yHighlight != 0) {
+                                    unHighlight(xHighlight, yHighlight);
+                                    switch (p) {
+                                    case 1:
+                                        placeP1Piece(xHighlight, yHighlight);
+                                        break;
+                                    case 2:
+                                        placeP2Piece(xHighlight, yHighlight);
+                                        break;
+                                    }
+                                }
+                                xHighlight = *x;
+                                yHighlight = *y;
+                                highlight(*x, *y);
+                                switch (p) {
+                                case 1:
+                                    placeP1Piece(*x, *y);
+                                    break;
+                                case 2:
+                                    placeP2Piece(*x, *y);
+                                    break;
+                                }
+                            }
+                            message1 = "";
+                            message2 = "";
+                        }
+                        else {
+                            message1 = "No puedes colocar una ficha encima de otra!";
+                            message2 = "";
+                        }
                     }
                 }
-                break;
+            }
+            else {
+                message1 = "Aun no puedes seleccionar fichas, termina de colocarlas primero!";
+                message2 = "";
             }
             break;
         }
@@ -757,7 +758,6 @@ int main() {
     gridStats[2][4] = 2;
     while (true) {
 
-        // Game updates
         playerMoved = false;
 
         drawStatsBoard(playerTurn);
@@ -775,6 +775,8 @@ int main() {
                 break;
             }
         }
+
+        if (p1.piecesPlaced >= 10 && p2.piecesPlaced >= 10) secondFase = true;
     }
 
     // POST-GAME

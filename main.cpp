@@ -11,11 +11,14 @@ short xHighlight = 0, yHighlight = 0;
 short piecesPlaced = 0;
 bool playerMoved;
 bool secondFase = false;
+bool capture = false;
+bool winner = false;
+short playerWhoWon;
 
 struct player {
     string name;
     short color;
-    short captured_pieces;
+    short captured_pieces = 0;
     short moves = 0;
     short piecesPlaced = 0;
 };
@@ -23,7 +26,6 @@ struct player {
 player p1;
 player p2;
 
-short moves = 0;
 string message1;
 string message2;
 string playerTurnMsg;
@@ -89,13 +91,13 @@ short grid[TWaH][TWaH] = {
     {9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9},
     {9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9},
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
-    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,5,1,1,1,1,1,5,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,5,1,1,1,5,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,5,1,5,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,5,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,5,1,5,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,5,1,1,1,5,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
+    {9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,5,1,1,1,1,1,5,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9},
     {9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9},
     {9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9},
     {9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,9,0,0,0,0,0,0,0,9},
@@ -126,7 +128,7 @@ short gridStats[5][5] = {
 short gridBackground[5][5] = {
     {1,0,1,0,1},
     {0,1,0,1,0},
-    {1,0,1,0,1},
+    {1,0,5,0,1},
     {0,1,0,1,0},
     {1,0,1,0,1}
 };
@@ -216,7 +218,7 @@ void instructions() {
     Console::SetCursorPosition(45, 30);
     cout << char(46) << " Se gana si se capturan todas las fichas contrarias.";
     Console::SetCursorPosition(45, 31);
-    cout << char(46) << " Cada jugador puede construir una barrera (o muro) con fichas detrás de la cual";
+    cout << char(46) << " Cada jugador puede construir una barrera (o muro) con fichas detras de la cual";
     Console::SetCursorPosition(47, 32);
     cout << "solo se encuentran sus propias fichas que pueden moverse sin peligro de ser capturadas.";
     Console::SetCursorPosition(45, 33);
@@ -246,6 +248,8 @@ void drawPlayerInstructions() {
     cout << "Para mover una ficha seleccionalo usando la tecla [x], luego dirijete a la casilla donde quieras";
     Console::SetCursorPosition(45, 9);
     cout << "mover la ficha u presiona [x] de nuevo.";
+    Console::SetCursorPosition(45, 10);
+    cout << "Para pasar tu turno y darle turno a tu oponente presiona [t]";
     Console::ForegroundColor = ConsoleColor::DarkGray;
     Console::SetCursorPosition(69, 12);
     cout << "Precione cualquier tecla para continuar...";
@@ -392,6 +396,10 @@ void interperate(short num) {
         Console::ForegroundColor = ConsoleColor::Black; // Dark square filling
         cout << char(219) << char(219);
         break;
+    case 5:
+        Console::ForegroundColor = ConsoleColor::DarkCyan;
+        cout << char(219) << char(219);
+        break;
     case 9:
         Console::ForegroundColor = ConsoleColor::DarkGray; // Inbetween square filling
         cout << char(219) << char(219);
@@ -497,6 +505,15 @@ void highlight(short x, short y) {
 void unHighlight(short x, short y) {
     short xStartPos = UNIT * (x - 1) + 1;
     short yStartPos = 2 * UNIT * (y - 1) + 2;
+    short bruh[7][7] = {
+        {5,1,1,1,1,1,5},
+        {1,5,1,1,1,5,1},
+        {1,1,5,1,5,1,1},
+        {1,1,1,5,1,1,1},
+        {1,1,5,1,5,1,1},
+        {1,5,1,1,1,5,1},
+        {5,1,1,1,1,1,5}
+    };
     switch (gridBackground[x - 1][y - 1]) {
     case 0:
         Console::ForegroundColor = ConsoleColor::Cyan;
@@ -505,42 +522,80 @@ void unHighlight(short x, short y) {
         Console::ForegroundColor = ConsoleColor::Black;
         break;
     }
-    for (short j = 0; j < 7; j++) {
-        for (short i = 0; i < 7; i++) {
-            Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
-            cout << char(219) << char(219);
+    if (gridBackground[x - 1][y - 1] == 5) {
+        for (short i = 17; i < 24; i++) {
+            for (short j = 17; j < 24; j++) {
+                Console::SetCursorPosition((j * 2), i);
+                cout << "  ";
+            }
+        }
+        short k = 0;
+        for (short i = 17; i < 24; i++) {
+            short q = 0;
+            for (short j = 17; j < 24; j++) {
+                Console::SetCursorPosition((j * 2), i);
+                interperate(bruh[k][q]);
+                ++q;
+            }
+            ++k;
+        }
+    }
+    else {
+        for (short j = 0; j < 7; j++) {
+            for (short i = 0; i < 7; i++) {
+                Console::SetCursorPosition(yStartPos + (i * 2), xStartPos + j);
+                cout << char(219) << char(219);
+            }
         }
     }
 }
 
 void drawStatsBoard(short p) {
-    Console::ForegroundColor = ConsoleColor::White;
+    Console::BackgroundColor = ConsoleColor::Black;
     Console::SetCursorPosition((TWaH * 2) + 5, 3);
     cout << "                                  ";
+    Console::ForegroundColor = ConsoleColor::Black;
+    switch (p) {
+    case 1:
+        Console::BackgroundColor = ConsoleColor(p1.color);
+        break;
+    case 2:
+        Console::BackgroundColor = ConsoleColor(p2.color);
+        break;
+    }
     Console::SetCursorPosition((TWaH * 2) + 5, 3);
     cout << "Le toca a ";
     switch (p) {
     case 1:
-        Console::ForegroundColor = ConsoleColor(p1.color);
         cout << p1.name;
         break;
     case 2:
-        Console::ForegroundColor = ConsoleColor(p2.color);
         cout << p2.name;
         break;
     }
+    Console::BackgroundColor = ConsoleColor::Black;
     Console::ForegroundColor = ConsoleColor::White;
     Console::SetCursorPosition((TWaH * 2) + 5, 5);
     cout << p1.name << " movimientos: " << p1.moves;
     Console::SetCursorPosition((TWaH * 2) + 5, 6);
     cout << p2.name << " movimientos: " << p2.moves;
     Console::ForegroundColor = ConsoleColor::White;
-    Console::SetCursorPosition((TWaH * 2) + 5, 7);
-    cout << "Movimientos total: " << moves;
+    Console::SetCursorPosition((TWaH * 2) + 5, 8);
+    cout << "Fichas capturadas de ";
+    Console::ForegroundColor = ConsoleColor(p1.color);
+    cout << p1.name;
+    Console::ForegroundColor = ConsoleColor::White;
+    cout << ": " << p1.captured_pieces;
+    Console::SetCursorPosition((TWaH * 2) + 5, 9);
+    cout << "Fichas capturadas de ";
+    Console::ForegroundColor = ConsoleColor(p2.color);
+    cout << p2.name;
+    Console::ForegroundColor = ConsoleColor::White;
+    cout << ": " << p2.captured_pieces;
     Console::SetCursorPosition((TWaH * 2) + 5, 11);
-    cout << "                                                                   ";
+    cout << "                                                                                        ";
     Console::SetCursorPosition((TWaH * 2) + 5, 12);
-    cout << "                                                                   ";
+    cout << "                                                                                        ";
     Console::ForegroundColor = ConsoleColor::Black;
     Console::BackgroundColor = ConsoleColor::White;
     Console::SetCursorPosition((TWaH * 2) + 5, 11);
@@ -549,6 +604,158 @@ void drawStatsBoard(short p) {
     cout << message2;
     Console::ForegroundColor = ConsoleColor::White;
     Console::BackgroundColor = ConsoleColor::Black;
+    //temp
+    for (short i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 14);
+        cout << "[" << gridStats[0][i] << "] ";
+    }
+    for (short i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 15);
+        cout << "[" << gridStats[1][i] << "] ";
+    }
+    for (short i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 16);
+        cout << "[" << gridStats[2][i] << "] ";
+    }
+    for (short i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 17);
+        cout << "[" << gridStats[3][i] << "] ";
+    }
+    for (short i = 0; i < 5; i++) {
+        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 18);
+        cout << "[" << gridStats[4][i] << "] ";
+    }
+}
+
+void checkForPieceCapture(short x, short y, short p) {
+    --x;
+    --y;
+    short upperX = x - 2;
+    short lowerX = x + 2;
+    short leftY = y - 2;
+    short rightY = y + 2;
+    short opponent;
+    switch (p) {
+    case 1:
+        opponent = 2;
+        break;
+    case 2:
+        opponent = 1;
+        break;
+    }
+    if (upperX >= 0) { // Checks if piece above can be captured
+        if (gridStats[upperX][y] == p && gridStats[x - 1][y] == opponent) {
+            unHighlight(x, y + 1);
+            gridStats[x - 1][y] = 0;
+            capture = true;
+            switch (p) {
+            case 1:
+                ++p1.captured_pieces;
+                break;
+            case 2:
+                ++p2.captured_pieces;
+                break;
+            }
+        }
+    }
+    if (lowerX <= 4) { // Checks if piece below can be captured
+        if (gridStats[lowerX][y] == p && gridStats[x + 1][y] == opponent) {
+            unHighlight(x + 2, y + 1);
+            gridStats[x + 1][y] = 0;
+            capture = true;
+            switch (p) {
+            case 1:
+                ++p1.captured_pieces;
+                break;
+            case 2:
+                ++p2.captured_pieces;
+                break;
+            }
+        }
+    }
+    if (leftY >= 0) { // Checks if piece to the left can be captured
+        if (gridStats[x][leftY] == p && gridStats[x][y - 1] == opponent) {
+            unHighlight(x + 1, y);
+            gridStats[x][y - 1] = 0;
+            capture = true;
+            switch (p) {
+            case 1:
+                ++p1.captured_pieces;
+                break;
+            case 2:
+                ++p2.captured_pieces;
+                break;
+            }
+        }
+    }
+    if (rightY <= 4) { // Checks if piece to the right can be captured
+        if (gridStats[x][rightY] == p && gridStats[x][y + 1] == opponent) {
+            unHighlight(x + 1, y + 2);
+            gridStats[x][y + 1] = 0;
+            capture = true;
+            switch (p) {
+            case 1:
+                ++p1.captured_pieces;
+                break;
+            case 2:
+                ++p2.captured_pieces;
+                break;
+            }
+        }
+    }
+}
+
+bool checkLocalAvailableCaptures(short x, short y, short p) {
+    bool capture_available = false;
+    short upperX = x - 2;
+    short lowerX = x + 2;
+    short leftY = y - 2;
+    short rightY = y + 2;
+    short opponent;
+    switch (p) {
+    case 1:
+        opponent = 2;
+        break;
+    case 2:
+        opponent = 1;
+        break;
+    }
+    if (upperX >= 0) {
+        if (((x-1) != 2 || y != 2) && gridStats[upperX][y] == p && gridStats[x - 1][y] == opponent) capture_available = true;
+    }
+    if (lowerX <= 4) {
+        if (((x + 1) != 2 || y != 2) && gridStats[lowerX][y] == p && gridStats[x + 1][y] == opponent) capture_available = true;
+    }
+    if (leftY >= 0) {
+        if ((x != 2 || (y-1) != 2) && gridStats[x][leftY] == p && gridStats[x][y - 1] == opponent) capture_available = true;
+    }
+    if (rightY <= 4) {
+        if ((x != 2 || (y + 1) != 2) && gridStats[x][rightY] == p && gridStats[x][y + 1] == opponent) capture_available = true;
+    }
+    return capture_available;
+}
+
+bool checkAvailableCaptures(short x, short y, short p) {
+    bool capture_available = false;
+    bool a = false, b = false, c = false, d = false;
+    --x;
+    --y;
+    if (gridStats[x - 1][y] == 0) {
+        a = checkLocalAvailableCaptures(x - 1, y, p);
+    }
+    if (gridStats[x + 1][y] == 0) {
+        b = checkLocalAvailableCaptures(x + 1, y, p);
+    }
+    if (gridStats[x][y - 1] == 0) {
+        c = checkLocalAvailableCaptures(x, y - 1, p);
+    }
+    if (gridStats[x][y + 1] == 0) {
+        d = checkLocalAvailableCaptures(x, y + 1, p);
+    }
+    if (a || b || c || d) {
+        capture_available = true;
+    }
+    return capture_available;
 }
 
 void move(short* x, short* y, short p) {
@@ -658,10 +865,14 @@ void move(short* x, short* y, short p) {
                             gridStats[xHighlight - 1][yHighlight - 1] = 0;
                             switch (p) {
                             case 1:
+                                ++p1.moves;
                                 placeP1Piece(*x, *y);
+                                checkForPieceCapture(*x, *y, p);
                                 break;
                             case 2:
+                                ++p2.moves;
                                 placeP2Piece(*x, *y);
+                                checkForPieceCapture(*x, *y, p);
                                 break;
                             }
                             unHighlight(xHighlight, yHighlight);
@@ -715,7 +926,21 @@ void move(short* x, short* y, short p) {
                 message2 = "";
             }
             break;
+        case 'T':
+            playerMoved = true;
+            break;
         }
+    }
+}
+
+void checkForWinner() {
+    if (p1.captured_pieces == 12) {
+        winner = true;
+        playerWhoWon = 1;
+    }
+    else if (p2.captured_pieces == 12) {
+        winner = true;
+        playerWhoWon = 2;
     }
 }
 
@@ -756,14 +981,22 @@ int main() {
     gridStats[2][0] = 2;
     placeP2Piece(3, 5);
     gridStats[2][4] = 2;
-    while (true) {
+
+    while (winner) {
 
         playerMoved = false;
+        capture = false;
 
         drawStatsBoard(playerTurn);
         drawSelector(x, y);
         move(&x, &y, playerTurn);
         erraseSelector(Xant, Yant);
+
+        if (capture && checkAvailableCaptures(x, y, playerTurn)) {
+            playerMoved = false;
+            message1 = "Como has realizado una captura y tienes posibilidad puedes mover de nuevo.";
+            message2 = "Quisieras mover de nuevo o pasar tu turno a tu oponente?";
+        }
 
         if (playerMoved) {
             switch (playerTurn) {
@@ -776,9 +1009,53 @@ int main() {
             }
         }
 
-        if (p1.piecesPlaced >= 10 && p2.piecesPlaced >= 10) secondFase = true;
+        if (p1.piecesPlaced >= 10 && p2.piecesPlaced >= 10 && secondFase == false) {
+            secondFase = true;
+            playerTurn = 2;
+        }
+
+        checkForWinner();
     }
 
     // POST-GAME
+    Console::ForegroundColor = ConsoleColor::Black;
+    for (short i = 0; i < 175; i++) {
+        for (short j = 0; j < 21; j++) {
+            Console::SetCursorPosition(i,j+15);
+            cout << char(219);
+        }
+    }
+    playerWhoWon = 1;
+    switch (playerWhoWon) {
+    case 1:
+        Console::ForegroundColor = ConsoleColor(p1.color);
+        break;
+    case 2:
+        Console::ForegroundColor = ConsoleColor(p2.color);
+        break;
+    }
+    for (short i = 58; i < 116; i++) {
+        Console::SetCursorPosition(i, 22);
+        cout << char(219);
+    }
+    for (short i = 58; i < 116; i++) {
+        Console::SetCursorPosition(i, 28);
+        cout << char(219);
+    }
+    for (short i = 22; i < 28; i++) {
+        Console::SetCursorPosition(58, i);
+        cout << char(219);
+        Console::SetCursorPosition(115, i);
+        cout << char(219);
+    }
+    Console::SetCursorPosition(75, 25);
+    switch (playerWhoWon) {
+    case 1:
+        cout << p1.name << " GANO!!!!!!!!!!!!!!!";
+        break;
+    case 2:
+        cout << p2.name << " GANO!!!!!!!!!!!!!!!";
+        break;
+    }
     getch();
 }

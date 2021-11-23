@@ -247,9 +247,9 @@ void drawPlayerInstructions() {
     Console::SetCursorPosition(45, 8);
     cout << "Para mover una ficha seleccionalo usando la tecla [x], luego dirijete a la casilla donde quieras";
     Console::SetCursorPosition(45, 9);
-    cout << "mover la ficha u presiona [x] de nuevo.";
+    cout << "mover la ficha u presiona [x] de nuevo. Para pasar tu turno y darle turno a tu oponente";
     Console::SetCursorPosition(45, 10);
-    cout << "Para pasar tu turno y darle turno a tu oponente presiona [t]";
+    cout << "presiona [t]. Para parar el juego preciona [q] y el jugador con mas capturas ganara.";
     Console::ForegroundColor = ConsoleColor::DarkGray;
     Console::SetCursorPosition(69, 12);
     cout << "Precione cualquier tecla para continuar...";
@@ -581,13 +581,13 @@ void drawStatsBoard(short p) {
     cout << p2.name << " movimientos: " << p2.moves;
     Console::ForegroundColor = ConsoleColor::White;
     Console::SetCursorPosition((TWaH * 2) + 5, 8);
-    cout << "Fichas capturadas de ";
+    cout << "Fichas capturadas por ";
     Console::ForegroundColor = ConsoleColor(p1.color);
     cout << p1.name;
     Console::ForegroundColor = ConsoleColor::White;
     cout << ": " << p1.captured_pieces;
     Console::SetCursorPosition((TWaH * 2) + 5, 9);
-    cout << "Fichas capturadas de ";
+    cout << "Fichas capturadas por ";
     Console::ForegroundColor = ConsoleColor(p2.color);
     cout << p2.name;
     Console::ForegroundColor = ConsoleColor::White;
@@ -908,6 +908,9 @@ void move(short* x, short* y, short p) {
         case 'T':
             playerMoved = true;
             break;
+        case 'Q':
+            winner = true;
+            break;
         }
     }
 }
@@ -997,6 +1000,13 @@ int main() {
     }
 
     // POST-GAME
+    if (p1.captured_pieces > p2.captured_pieces) {
+        playerWhoWon = 1;
+    }
+    else if (p1.captured_pieces < p2.captured_pieces) {
+        playerWhoWon = 2;
+    }
+
     Console::ForegroundColor = ConsoleColor::Black;
     for (short i = 0; i < 175; i++) {
         for (short j = 0; j < 21; j++) {

@@ -604,27 +604,6 @@ void drawStatsBoard(short p) {
     cout << message2;
     Console::ForegroundColor = ConsoleColor::White;
     Console::BackgroundColor = ConsoleColor::Black;
-    //temp
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 14);
-        cout << "[" << gridStats[0][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 15);
-        cout << "[" << gridStats[1][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 16);
-        cout << "[" << gridStats[2][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 17);
-        cout << "[" << gridStats[3][i] << "] ";
-    }
-    for (short i = 0; i < 5; i++) {
-        Console::SetCursorPosition((TWaH * 2) + 5 + (i * 4), 18);
-        cout << "[" << gridStats[4][i] << "] ";
-    }
 }
 
 void checkForPieceCapture(short x, short y, short p) {
@@ -982,7 +961,7 @@ int main() {
     placeP2Piece(3, 5);
     gridStats[2][4] = 2;
 
-    while (winner) {
+    while (!winner) {
 
         playerMoved = false;
         capture = false;
@@ -1025,7 +1004,6 @@ int main() {
             cout << char(219);
         }
     }
-    playerWhoWon = 1;
     switch (playerWhoWon) {
     case 1:
         Console::ForegroundColor = ConsoleColor(p1.color);
